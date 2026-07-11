@@ -3,3 +3,4 @@ dist/
 .anyclaw-*
 deploy.zip
 vite.log
+.vercel
