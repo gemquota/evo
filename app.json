@@ -1,0 +1,6 @@
+{
+  "title": "Particle Life",
+  "description": "A mesmerizing particle life simulation with emergent flocking behavior, built with React and Vite.",
+  "category": "Simulation",
+  "icon": "icon.svg"
+}
