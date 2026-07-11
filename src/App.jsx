@@ -12,7 +12,6 @@ import {
 } from './simulation/config';
 import './App.css';
 
-// Build initial config with viewport-matched world dimensions
 function buildInitConfig() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -39,15 +38,12 @@ export default function App() {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Shared mutable snapshot of latest UI state for the engine loop
-  const configRef = useRef({ ...config, species, interactionMatrix });
+  // Synced every render for the animation loop to read
+  const configRef = useRef(undefined);
   configRef.current = { ...config, species, interactionMatrix };
 
-  // Simulation lifecycle (engine + renderer + animation loop)
-  // No mouseRef — touch-only device (Item 3)
   const sim = useSimulationLoop(canvasRef, containerRef, configRef);
 
-  // Input handling (touch + wheel + keyboard)
   useInputHandlers(containerRef, sim.engineRef, {
     setPanelOpen,
     togglePaused: sim.togglePaused,
@@ -56,7 +52,7 @@ export default function App() {
     setActiveSpecies,
   });
 
-  // ----- Callbacks shared by UI controls and keyboard -----
+  // ----- Callbacks -----
 
   const handlePresetSelect = useCallback(
     (preset) => {
@@ -73,7 +69,7 @@ export default function App() {
         sim.engineRef.current.setConfig(fc);
         sim.engineRef.current.reset();
         sim.engineRef.current.fitCamera();
-        sim.rendererRef.current?.clear();
+        if (sim.rendererRef.current) sim.rendererRef.current.clear();
       }
     },
     [config, sim.engineRef, sim.rendererRef]
@@ -86,13 +82,9 @@ export default function App() {
     []
   );
 
-  const speciesRef = useRef(species);
-  speciesRef.current = species;
-
   const handleSpeciesChange = useCallback(
     (ns) => {
-      const old = speciesRef.current;
-      const needsReset = ns.some((s, i) => s.count !== old[i]?.count);
+      const needsReset = ns.some((s, i) => s.count !== species[i]?.count);
       const validated = validateSpecies(ns);
       setSpecies(validated);
       const fc = { ...config, species: validated, interactionMatrix };
@@ -102,11 +94,11 @@ export default function App() {
         if (needsReset) {
           sim.engineRef.current.reset();
           sim.engineRef.current.fitCamera();
-          sim.rendererRef.current?.clear();
+          if (sim.rendererRef.current) sim.rendererRef.current.clear();
         }
       }
     },
-    [config, interactionMatrix, sim.engineRef, sim.rendererRef]
+    [config, interactionMatrix, species, sim.engineRef, sim.rendererRef]
   );
 
   const { fps, particleCount, frameTime, visibleCount, speciesCounts } = sim.simStats;
@@ -117,12 +109,11 @@ export default function App() {
         <canvas ref={canvasRef} />
       </div>
 
-      {/* Stats overlay (Item 1: React stats instead of canvas drawStats) */}
       {config.showStats && (
         <StatsOverlay
           fps={fps}
           particleCount={particleCount}
-          frameTime={Math.round(frameTime)}
+          frameTime={frameTime}
           visibleCount={visibleCount}
           speciesStats={speciesCounts}
           speciesConfig={species}
@@ -137,25 +128,16 @@ export default function App() {
         </div>
         <div className="top-actions">
           <div className="top-stats">
-            <span
-              className={`stat-fps ${
-                fps >= 30 ? 'good' : fps >= 15 ? 'ok' : 'bad'
-              }`}
-            >
+            <span className={`stat-fps ${fps >= 30 ? 'good' : fps >= 15 ? 'ok' : 'bad'}`}>
               {fps} FPS
             </span>
             <span style={{ color: '#8888a5' }}>{particleCount}</span>
             {sim.paused && <span style={{ color: '#fbbf24' }}>⏸</span>}
           </div>
-          <button
-            className={`top-btn ${!panelOpen ? 'active' : ''}`}
-            onClick={() => setPanelOpen((p) => !p)}
-          >
+          <button className={`top-btn ${!panelOpen ? 'active' : ''}`} onClick={() => setPanelOpen((p) => !p)}>
             UI <kbd>H</kbd>
           </button>
-          <button className="top-btn" onClick={sim.handleFitCamera}>
-            ⊞
-          </button>
+          <button className="top-btn" onClick={sim.handleFitCamera}>⊞</button>
         </div>
       </div>
 
@@ -179,7 +161,7 @@ export default function App() {
 
       <div className="bottom-hint">
         <kbd>H</kbd> UI · <kbd>Space</kbd> pause · <kbd>R</kbd> reset ·{' '}
-        <kbd>F</kbd> fit · Touch: attract · Pinch: zoom
+        <kbd>F</kbd> fit · Touch: attract · Pinch: zoom · Two-finger: pan
       </div>
     </div>
   );

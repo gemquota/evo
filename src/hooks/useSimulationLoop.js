@@ -53,20 +53,20 @@ export function useSimulationLoop(canvasRef, containerRef, configRef) {
         const snapshot = engineRef.current.getSnapshot();
         rendererRef.current.render(snapshot, configRef.current);
 
-        // Throttle React state updates — only publish when values change
+        // Throttle React state updates — use tolerance for float comparison
         const last = lastPublishedRef.current;
         const fps = rendererRef.current.fps;
         const count = engineRef.current.particles.length;
         const ft = rendererRef.current.frameTime;
         const vis = rendererRef.current.visibleCount;
 
-        if (fps !== last.fps || count !== last.count || ft !== last.ft || vis !== last.vis) {
+        if (fps !== last.fps || count !== last.count || Math.abs(ft - last.ft) > 0.5 || vis !== last.vis) {
           last.fps = fps;
           last.count = count;
           last.ft = ft;
           last.vis = vis;
           const st = engineRef.current.getStats();
-          setSimStats({ fps, particleCount: count, frameTime: ft, visibleCount: vis, speciesCounts: st.species });
+          setSimStats({ fps, particleCount: count, frameTime: Math.round(ft), visibleCount: vis, speciesCounts: st.species });
         }
       }
       animRef.current = requestAnimationFrame(loop);
@@ -85,11 +85,13 @@ export function useSimulationLoop(canvasRef, containerRef, configRef) {
   }, []);
 
   const handleReset = useCallback(() => {
-    if (engineRef.current) {
-      engineRef.current.setConfig(configRef.current);
-      engineRef.current.reset();
-      engineRef.current.fitCamera();
-      rendererRef.current?.clear();
+    const eng = engineRef.current;
+    const ren = rendererRef.current;
+    if (eng) {
+      eng.setConfig(configRef.current);
+      eng.reset();
+      eng.fitCamera();
+      if (ren) ren.clear();
     }
   }, []);
 

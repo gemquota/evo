@@ -7,12 +7,12 @@ export function useInputHandlers(containerRef, engineRef, {
   handleFitCamera,
   setActiveSpecies,
 }) {
-  // Touch + wheel events only (Item 3: touch-only)
+  // Touch + wheel events only
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Wheel zoom (also works as scroll on desktop)
+    // Wheel zoom
     const onWheel = (e) => {
       e.preventDefault();
       if (!engineRef.current) return;
@@ -28,11 +28,29 @@ export function useInputHandlers(containerRef, engineRef, {
       engineRef.current.camY += (b.y - a.y) * engineRef.current.camZoom;
     };
 
-    // Touch support: single-finger drag to attract, two-finger pinch-zoom
+    // Touch: single-finger attract, two-finger pinch-zoom + pan
     let tStart = [];
+    let tCamStart = { x: 0, y: 0 };
+    let tStartCentroid = { x: 0, y: 0 };
 
     const onTouchStart = (e) => {
-      tStart = Array.from(e.changedTouches);
+      tStart = Array.from(e.touches);
+      if (e.touches.length === 1) {
+        // Single finger: attract begins
+        const r = container.getBoundingClientRect();
+        const t = e.touches[0];
+        if (engineRef.current) {
+          engineRef.current.setTouchAttract(t.clientX - r.left, t.clientY - r.top);
+        }
+      } else if (e.touches.length === 2 && engineRef.current) {
+        // Clear attract when two fingers touch
+        engineRef.current.clearTouchAttract();
+        tCamStart = { x: engineRef.current.camX, y: engineRef.current.camY };
+        tStartCentroid = {
+          x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+          y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+        };
+      }
     };
 
     const onTouchMove = (e) => {
@@ -40,60 +58,36 @@ export function useInputHandlers(containerRef, engineRef, {
       const r = container.getBoundingClientRect();
 
       if (e.touches.length === 1) {
-        // Single finger: apply attraction force at touch point
+        // Single finger: update attract point
         const t = e.touches[0];
         if (engineRef.current) {
-          const w = engineRef.current.screenToWorld(t.clientX - r.left, t.clientY - r.top);
-          const mx = w.x, my = w.y;
-          const config = engineRef.current.config;
-          const mf = config.attractForce || 2;
-          const mr = (config.attractRadius || 300) / engineRef.current.camZoom;
-          const particles = engineRef.current.particles;
-          const edgeMode = config.edgeMode || 'wrap';
-          const W = engineRef.current.ww;
-          const H = engineRef.current.wh;
-          const timeScale = config.timeScale || 1;
-          for (let i = 0; i < particles.length; i++) {
-            const p = particles[i];
-            let dx = mx - p.x, dy = my - p.y;
-            if (edgeMode === 'wrap') {
-              if (dx > W / 2) dx -= W;
-              if (dx < -W / 2) dx += W;
-              if (dy > H / 2) dy -= H;
-              if (dy < -H / 2) dy += H;
-            }
-            const d = Math.sqrt(dx * dx + dy * dy);
-            if (d < mr && d > 1) {
-              const s = mf * (1 - d / mr) * timeScale;
-              p.vx += (s * dx) / d;
-              p.vy += (s * dy) / d;
-            }
-          }
+          engineRef.current.setTouchAttract(t.clientX - r.left, t.clientY - r.top);
         }
       } else if (e.touches.length === 2 && engineRef.current) {
-        // Two fingers: pinch-zoom
         const t = Array.from(e.touches);
-        const t0 = tStart;
-        const d0 = Math.hypot(
-          t[0].clientX - t[1].clientX,
-          t[0].clientY - t[1].clientY
-        );
-        const d1 = Math.hypot(
-          t0[0].clientX - t0[1].clientX,
-          t0[0].clientY - t0[1].clientY
-        );
+
+        // Incremental pinch-zoom
+        const d0 = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+        const d1 = Math.hypot(tStart[0].clientX - tStart[1].clientX, tStart[0].clientY - tStart[1].clientY);
         if (d1 > 0) {
-          const cz = engineRef.current.camZoom;
-          engineRef.current.camZoom = Math.min(
-            20,
-            Math.max(0.05, cz * (d0 / d1))
-          );
+          engineRef.current.camZoom = Math.min(20, Math.max(0.05, engineRef.current.camZoom * (d0 / d1)));
         }
-        tStart = t;
+
+        // Absolute pan from initial two-finger centroid
+        const centroid = {
+          x: (t[0].clientX + t[1].clientX) / 2,
+          y: (t[0].clientY + t[1].clientY) / 2,
+        };
+        engineRef.current.camX = tCamStart.x + (centroid.x - tStartCentroid.x);
+        engineRef.current.camY = tCamStart.y + (centroid.y - tStartCentroid.y);
+
+        tStart = t; // update reference for next zoom frame
       }
     };
 
-    const onTouchEnd = () => {};
+    const onTouchEnd = () => {
+      if (engineRef.current) engineRef.current.clearTouchAttract();
+    };
 
     container.addEventListener('wheel', onWheel, { passive: false });
     container.addEventListener('touchstart', onTouchStart, { passive: false });
@@ -123,34 +117,15 @@ export function useInputHandlers(containerRef, engineRef, {
         }
       }
       switch (e.key.toLowerCase()) {
-        case 'h':
-          setPanelOpen((p) => !p);
-          break;
-        case ' ':
-          e.preventDefault();
-          togglePaused();
-          break;
-        case 'r':
-          handleReset();
-          break;
-        case 'f':
-          handleFitCamera();
-          break;
-        case '1':
-          setActiveSpecies(0);
-          break;
-        case '2':
-          setActiveSpecies(1);
-          break;
-        case '3':
-          setActiveSpecies(2);
-          break;
-        case '4':
-          setActiveSpecies(3);
-          break;
-        case '5':
-          setActiveSpecies(4);
-          break;
+        case 'h': setPanelOpen((p) => !p); break;
+        case ' ': e.preventDefault(); togglePaused(); break;
+        case 'r': handleReset(); break;
+        case 'f': handleFitCamera(); break;
+        case '1': setActiveSpecies(0); break;
+        case '2': setActiveSpecies(1); break;
+        case '3': setActiveSpecies(2); break;
+        case '4': setActiveSpecies(3); break;
+        case '5': setActiveSpecies(4); break;
       }
     };
     window.addEventListener('keydown', onKey);

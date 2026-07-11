@@ -105,12 +105,12 @@ function Controls({
               <div className="species-controls">
                 <Slider label="Count" value={cur.count} min={10} max={3000} step={10} onChange={sp(activeSpecies, 'count')} />
                 <Slider label="Speed" value={cur.speed} min={1} max={100} step={0.5} onChange={sp(activeSpecies, 'speed')} formatValue={v => v.toFixed(1)} />
-                <Slider label="Max Speed" value={cur.maxSpeed} min={1} max={150} step={0.5} onChange={sp(activeSpecies, 'maxSpeed')} formatValue={v => v.toFixed(1)} />
+                <Slider label="Max Speed" value={cur.maxSpeed} min={1} max={300} step={0.5} onChange={sp(activeSpecies, 'maxSpeed')} formatValue={v => v.toFixed(1)} />
                 <Slider label="Size" value={cur.size} min={0.5} max={12} step={0.5} onChange={sp(activeSpecies, 'size')} formatValue={v => v.toFixed(1)} />
                 <ColorSlider label="Color" value={cur.hue} onChange={sp(activeSpecies, 'hue')} />
                 <Slider label="Saturation" value={cur.saturation} min={0} max={100} step={1} onChange={sp(activeSpecies, 'saturation')} />
                 <Slider label="Lightness" value={cur.lightness} min={20} max={90} step={1} onChange={sp(activeSpecies, 'lightness')} />
-                <Slider label="Interaction Radius" value={cur.interactionRadius} min={50} max={3000} step={50} onChange={sp(activeSpecies, 'interactionRadius')} />
+                <Slider label="Interaction Radius" value={cur.interactionRadius} min={50} max={5000} step={50} onChange={sp(activeSpecies, 'interactionRadius')} />
                 <Slider label="Repulsion Radius" value={cur.repulsionRadius} min={10} max={800} step={5} onChange={sp(activeSpecies, 'repulsionRadius')} />
                 <Slider label="Repulsion Strength" value={cur.repulsionStrength} min={0.1} max={3} step={0.05} onChange={sp(activeSpecies, 'repulsionStrength')} formatValue={v => v.toFixed(2)} />
               </div>

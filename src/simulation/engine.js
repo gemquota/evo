@@ -15,6 +15,9 @@ export class ParticleLifeEngine {
     // Stats cache
     this._prevSpeciesCounts = null;
     this._prevSpeciesNames = null;
+    // Touch attract state (set by input handler, consumed in _doPhysics)
+    this._touchAttractX = null;
+    this._touchAttractY = null;
   }
 
   setConfig(config) {
@@ -46,7 +49,18 @@ export class ParticleLifeEngine {
     };
   }
 
-  // Snapshot for renderer — world dimensions come from config, not here
+  // Touch attract — called from the touch handler (Item 3: consolidated in engine)
+  setTouchAttract(screenX, screenY) {
+    const w = this.screenToWorld(screenX, screenY);
+    this._touchAttractX = w.x;
+    this._touchAttractY = w.y;
+  }
+
+  clearTouchAttract() {
+    this._touchAttractX = null;
+    this._touchAttractY = null;
+  }
+
   getSnapshot() {
     return {
       particles: this.particles,
@@ -76,7 +90,10 @@ export class ParticleLifeEngine {
       }
     }
 
+    // Guard against zero total
     const total = species.reduce((s, sp) => s + Math.max(0, Math.floor(sp.count || 0)), 0);
+    if (total === 0) { this.initialized = true; return; }
+
     this.particles = new Array(total);
     let idx = 0;
 
@@ -205,8 +222,8 @@ export class ParticleLifeEngine {
               fx += f * dxp * inv; fy += f * dyp * inv;
             } else {
               const t = (d - minR) / (maxRi - minR);
-              fx += matrixRow[q.species] * (1 - t) * (1 - t) * dxp * inv;
-              fy += matrixRow[q.species] * (1 - t) * (1 - t) * dyp * inv;
+              const g = matrixRow[q.species] * (1 - t) * (1 - t);
+              fx += g * dxp * inv; fy += g * dyp * inv;
             }
           }
         }
@@ -238,7 +255,7 @@ export class ParticleLifeEngine {
       const spd = Math.sqrt(p.vx * p.vx + p.vy * p.vy + p.vz * p.vz);
       if (spd > maxSpd) { const sc = maxSpd / spd; p.vx *= sc; p.vy *= sc; p.vz *= sc; }
 
-      // Edge handling — all three modes now implemented
+      // Edge handling
       if (edgeMode === 'wrap') {
         if (p.x < 0) p.x += W; if (p.x >= W) p.x -= W;
         if (p.y < 0) p.y += H; if (p.y >= H) p.y -= H;
@@ -259,7 +276,28 @@ export class ParticleLifeEngine {
         if (p.z >= ZR) { p.z = ZR - 1; p.vz = -p.vz * 0.5; }
       }
     }
-    // Mouse interaction removed — touch-only device
+
+    // Touch attract — consolidated here instead of in the touch handler (Item 3)
+    if (this._touchAttractX != null && this._touchAttractY != null) {
+      const mx = this._touchAttractX;
+      const my = this._touchAttractY;
+      const mf = config.attractForce || 2;
+      const mr = (config.attractRadius || 300) / this.camZoom;
+      for (let i = 0; i < n; i++) {
+        const p = particles[i];
+        let dx = mx - p.x, dy = my - p.y;
+        if (edgeMode === 'wrap') {
+          if (dx > W / 2) dx -= W; if (dx < -W / 2) dx += W;
+          if (dy > H / 2) dy -= H; if (dy < -H / 2) dy += H;
+        }
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < mr && d > 1) {
+          const s = mf * (1 - d / mr) * timeScale;
+          p.vx += (s * dx) / d;
+          p.vy += (s * dy) / d;
+        }
+      }
+    }
   }
 
   getStats() {
@@ -275,7 +313,10 @@ export class ParticleLifeEngine {
     const counts = this._prevSpeciesCounts;
     const names = this._prevSpeciesNames;
     for (let i = 0; i < counts.length; i++) counts[i] = 0;
-    for (let i = 0; i < n; i++) counts[this.particles[i].species]++;
+    for (let i = 0; i < n; i++) {
+      const si = this.particles[i].species;
+      if (si >= 0 && si < counts.length) counts[si]++;
+    }
 
     const speciesObj = {};
     for (let i = 0; i < counts.length; i++) speciesObj[names[i]] = counts[i];
