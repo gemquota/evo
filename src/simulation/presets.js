@@ -2,11 +2,11 @@
 
 function baseSpecies() {
   return [
-    { name: 'Cyan', count: 1500, speed: 18, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 350, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 30 },
-    { name: 'Magenta', count: 1500, speed: 14, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 300, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 26 },
-    { name: 'Lime', count: 1500, speed: 22, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 280, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 34 },
-    { name: 'Gold', count: 1500, speed: 12, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 400, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 24 },
-    { name: 'Coral', count: 1500, speed: 16, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 320, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 28 },
+    { name: 'Cyan', count: 1000, speed: 18, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
+    { name: 'Magenta', count: 1000, speed: 14, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
+    { name: 'Lime', count: 1000, speed: 22, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
+    { name: 'Gold', count: 1000, speed: 12, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
+    { name: 'Coral', count: 1000, speed: 16, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
   ];
 }
 
@@ -48,11 +48,11 @@ export const PRESETS = [
 
   // Ecosystem — predator-prey chasing and swarming
   preset([
-    { name: 'Prey', count: 1800, speed: 24, size: 2, hue: 120, saturation: 85, lightness: 60, interactionRadius: 400, repulsionRadius: 60, repulsionStrength: 1.5, maxSpeed: 38 },
-    { name: 'Predator', count: 300, speed: 30, size: 5, hue: 0, saturation: 90, lightness: 55, interactionRadius: 600, repulsionRadius: 100, repulsionStrength: 0.4, maxSpeed: 48 },
-    { name: 'Scavenger', count: 800, speed: 18, size: 2.5, hue: 40, saturation: 85, lightness: 55, interactionRadius: 300, repulsionRadius: 55, repulsionStrength: 0.9, maxSpeed: 24 },
-    { name: 'Toxin', count: 400, speed: 8, size: 4.5, hue: 280, saturation: 80, lightness: 55, interactionRadius: 250, repulsionRadius: 120, repulsionStrength: 0.3, maxSpeed: 15 },
-    { name: 'Symbiote', count: 500, speed: 14, size: 2, hue: 200, saturation: 90, lightness: 60, interactionRadius: 280, repulsionRadius: 50, repulsionStrength: 1.8, maxSpeed: 24 },
+    { name: 'Prey', count: 1000, speed: 24, size: 2, hue: 120, saturation: 85, lightness: 60, interactionRadius: 800, repulsionRadius: 60, repulsionStrength: 1.5, maxSpeed: 80 },
+    { name: 'Predator', count: 200, speed: 30, size: 5, hue: 0, saturation: 90, lightness: 55, interactionRadius: 1000, repulsionRadius: 100, repulsionStrength: 0.4, maxSpeed: 100 },
+    { name: 'Scavenger', count: 500, speed: 18, size: 2.5, hue: 40, saturation: 85, lightness: 55, interactionRadius: 600, repulsionRadius: 55, repulsionStrength: 0.9, maxSpeed: 50 },
+    { name: 'Toxin', count: 300, speed: 8, size: 4.5, hue: 280, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 120, repulsionStrength: 0.3, maxSpeed: 30 },
+    { name: 'Symbiote', count: 300, speed: 14, size: 2, hue: 200, saturation: 90, lightness: 60, interactionRadius: 550, repulsionRadius: 50, repulsionStrength: 1.8, maxSpeed: 50 },
   ], [
     [ 0.8, -1.0,  0.3,  0.0,  0.5],
     [ 1.0,  0.0, -0.6, -0.3,  0.2],

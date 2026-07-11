@@ -33,7 +33,7 @@ export class ParticleLifeEngine {
   get zRange() { return this.config.zRange || 1000; }
 
   fitCamera() {
-    const z = Math.min(this.viewWidth / this.ww, this.viewHeight / this.wh) * 0.9;
+    const z = Math.min(this.viewWidth / this.ww, this.viewHeight / this.wh);
     this.camZoom = z;
     this.camX = (this.viewWidth - this.ww * z) / 2;
     this.camY = (this.viewHeight - this.wh * z) / 2;
