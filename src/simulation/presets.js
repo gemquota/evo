@@ -20,7 +20,7 @@ function preset(species, matrix, global) {
 
 export const PRESETS = [
   // Spiralis — rotating spirals and orbiting clusters
-  preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 1.2) })), [
+  preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 1.0) })), [
     [ 0.0,  0.7, -0.4,  0.3, -0.2],
     [-0.3,  0.0,  0.8, -0.5,  0.4],
     [ 0.4, -0.5,  0.0,  0.7, -0.3],
