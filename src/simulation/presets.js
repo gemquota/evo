@@ -2,11 +2,11 @@
 
 function baseSpecies() {
   return [
-    { name: "Cyan", count: 1200, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
-    { name: "Magenta", count: 800, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
-    { name: "Lime", count: 1500, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
-    { name: "Gold", count: 500, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
-    { name: "Coral", count: 1000, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
+    { name: "Cyan", count: 240, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
+    { name: "Magenta", count: 160, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
+    { name: "Lime", count: 300, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
+    { name: "Gold", count: 100, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
+    { name: "Coral", count: 200, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
   ];
 }
 
@@ -21,11 +21,11 @@ function preset(species, matrix, global) {
 export const PRESETS = [
   // Spiralis — rotating spirals and orbiting clusters
   preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 1.0) })), [
-    [ 0.0,  0.5, -0.6,  0.4, -0.3],
-    [-0.8,  0.0,  0.9, -0.7,  0.5],
-    [ 0.6, -0.9,  0.0,  0.8, -0.4],
-    [-0.5,  0.7, -0.8,  0.0,  0.6],
-    [ 0.3, -0.5,  0.4, -0.6,  0.0],
+    [ 0.2,  0.8, -0.7,  0.3, -0.5],
+    [-0.9,  0.1,  0.7, -0.6,  0.8],
+    [ 0.5, -0.8,  0.1,  0.9, -0.4],
+    [-0.6,  0.4, -0.9,  0.1,  0.7],
+    [ 0.3, -0.7,  0.5, -0.8,  0.0],
   ], { friction: 0.82, trailOpacity: 0.03, timeScale: 1.0, maxForce: 3.0, noiseAmount: 0.04, name: '🌀 Spiralis', desc: 'Rotating spirals and orbiting clusters' }),
 
   // Primordia — cell-like structures dividing and merging
@@ -97,17 +97,17 @@ export const DEFAULT_CONFIG = {
   interactionMatrix: PRESETS[0].interactionMatrix,
 
   // Dynamics
-  friction: 0.75, timeScale: 1.2, maxForce: 3.5, noiseAmount: 0.08,
+  friction: 0.78, timeScale: 1.0, maxForce: 4.0, noiseAmount: 0.12,
   minSpeed: 0, dragLinear: 0, physicsRate: 1,
-  velocityDampingZ: 0.82, velocityClip: 0, massVariation: 0,
+  velocityDampingZ: 0.82, velocityClip: 0, massVariation: 0.3,
 
   // Forces
-  gravityWell: 0, gravityWellRadius: 2500, vortexStrength: 0,
-  forceDecayPower: 2, interactionJitter: 0,
-  harmonicStrength: 0, harmonicRange: 1000,
-  repulsionFalloff: 1, wanderRate: 0,
+  gravityWell: 0.3, gravityWellRadius: 2500, vortexStrength: 0.2,
+  forceDecayPower: 1.5, interactionJitter: 0,
+  harmonicStrength: 0.1, harmonicRange: 1000,
+  repulsionFalloff: 1.5, wanderRate: 0.02,
   attractForce: 2.0, attractRadius: 300,
-  noiseFieldScale: 0.01, noiseFieldStrength: 0,
+  noiseFieldScale: 0.01, noiseFieldStrength: 0.5,
 
   // Boundary
   edgeMode: 'wrap',
@@ -124,29 +124,29 @@ export const DEFAULT_CONFIG = {
   spawnJitter: 0.2, centerBias: 0,
 
   // Advanced Physics
-  forceInertia: 0, interactionSymmetry: 0, pairwiseSkipChance: 0,
-  boundaryWarmth: 0, radialDrift: 0, noiseDrift: 0,
-  jerkLimit: 0, zGravity: 0, velocityExchange: 0,
-  velocityDecayAngle: 0, matrixDrift: 0,
+  forceInertia: 0.15, interactionSymmetry: 0, pairwiseSkipChance: 0,
+  boundaryWarmth: 0.3, radialDrift: 0.02, noiseDrift: 0,
+  jerkLimit: 0, zGravity: 0, velocityExchange: 0.1,
+  velocityDecayAngle: 0, matrixDrift: 0.002,
 
   // Environment Forces
-  windDir: 0, windStrength: 0, radialPulseAmp: 0, radialPulseFreq: 0.5,
-  tidalStrength: 0, noiseOctaves: 2, waveForceAmp: 0, waveFreq: 1, waveSpeed: 1,
+  windDir: 0, windStrength: 0.2, radialPulseAmp: 0.3, radialPulseFreq: 0.5,
+  tidalStrength: 0, noiseOctaves: 2, waveForceAmp: 0.2, waveFreq: 1, waveSpeed: 1,
 
   // Chemical / Signalling
-  chemDecay: 0.02, chemDiffusion: 0.2, chemEmissionRate: 0.3,
-  signalThreshold: 0.3, signalGain: 2, signalPropagation: 1.5,
+  chemDecay: 0.015, chemDiffusion: 0.25, chemEmissionRate: 0.4,
+  signalThreshold: 0.2, signalGain: 2.5, signalPropagation: 1.5,
 
   // Reproduction & Genetics
-  reproductionRate: 0.025, reproductionEnergy: 30, mutationRate: 0.02,
-  inheritTraits: 0.5, energyDecay: 0.01, maxEnergy: 200, reproductionCost: 15,
+  reproductionRate: 0.02, reproductionEnergy: 30, mutationRate: 0.02,
+  inheritTraits: 0.5, energyDecay: 0.008, maxEnergy: 250, reproductionCost: 20,
 
   // Accretion / Merging
   accretionRate: 0.01, mergeThreshold: 0.5, massAbsorption: 0.2, criticalMass: 15,
 
   // Social / Swarming
-  alignmentForce: 0, cohesionForce: 0, separationForce: 0,
-  leaderInfluence: 0, herdThreshold: 10, flockRadius: 300,
+  alignmentForce: 0.3, cohesionForce: 0.2, separationForce: 0.5,
+  leaderInfluence: 0, herdThreshold: 10, flockRadius: 200,
 
   // Lingual / Communication
   commRange: 200, commBandwidth: 0, signalMemory: 0, protocolComplexity: 0,
@@ -159,8 +159,8 @@ export const DEFAULT_CONFIG = {
   trailOpacity: 0.002, glowIntensity: 0,
   connectionDistance: 2500, connectionOpacity: 0.5,
   connectionWidth: 1.5, connectionFade: 1,
-  glowSpread: 1, hdrExposure: 1.5, saturationBoost: 0.3, borderGlow: 0,
-  trailGap: 1, colorShift: 0, particleContrast: 1,
+  glowSpread: 1, hdrExposure: 1.8, saturationBoost: 0.3, borderGlow: 0,
+  trailGap: 3, colorShift: 0, particleContrast: 1.3,
   starBrightness: 0.35, starDensity: 1, depthCue: 0.5,
   minRadius: 0.5, maxRadius: 12, gridOpacity: 0.15,
   particleOpacity: 1.0,
