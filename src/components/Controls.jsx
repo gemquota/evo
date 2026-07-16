@@ -15,7 +15,6 @@ function Controls({
 
   const dists = ['random', 'grid', 'cluster', 'ring'];
   const vels = ['random', 'zero', 'slow', 'fast', 'radial'];
-  const zMax = config.zRange || 1000;
 
   return (
     <>
@@ -39,101 +38,79 @@ function Controls({
             </div>
           </Collapsible>
 
-          <Collapsible title="Global" defaultOpen={true}>
+          <Collapsible title="Dynamics" defaultOpen={false}>
             <Slider label="Friction" value={config.friction} min={0.1} max={0.99} step={0.01} onChange={h('friction')} formatValue={v => v.toFixed(2)} />
             <Slider label="Time Scale" value={config.timeScale} min={0.05} max={3} step={0.05} onChange={h('timeScale')} formatValue={v => v.toFixed(2)} />
             <Slider label="Max Force" value={config.maxForce} min={0.1} max={5} step={0.1} onChange={h('maxForce')} formatValue={v => v.toFixed(1)} />
             <Slider label="Noise" value={config.noiseAmount} min={0} max={2} step={0.01} onChange={h('noiseAmount')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Trail Opacity" value={config.trailOpacity} min={0} max={0.2} step={0.002} onChange={h('trailOpacity')} formatValue={v => v.toFixed(3)} />
-            <Slider label="Glow Intensity" value={config.glowIntensity} min={0} max={2} step={0.05} onChange={h('glowIntensity')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Connection Dist" value={config.connectionDistance} min={50} max={2500} step={25} onChange={h('connectionDistance')} />
+            <Slider label="Mass Variation" value={config.massVariation} min={0} max={1} step={0.05} onChange={h('massVariation')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Linear Drag" value={config.dragLinear} min={0} max={0.5} step={0.01} onChange={h('dragLinear')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Min Speed" value={config.minSpeed} min={0} max={5} step={0.1} onChange={h('minSpeed')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Velocity Clip" value={config.velocityClip} min={0} max={1} step={0.05} onChange={h('velocityClip')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Physics Rate" value={config.physicsRate} min={1} max={5} step={1} onChange={h('physicsRate')} />
+          </Collapsible>
+
+          <Collapsible title="Forces" defaultOpen={false}>
+            <Slider label="Force Decay Power" value={config.forceDecayPower} min={0.5} max={4} step={0.1} onChange={h('forceDecayPower')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Force Jitter" value={config.interactionJitter} min={0} max={1} step={0.01} onChange={h('interactionJitter')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Force Inertia" value={config.forceInertia} min={0} max={0.95} step={0.05} onChange={h('forceInertia')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Interaction Symmetry" value={config.interactionSymmetry} min={0} max={1} step={0.05} onChange={h('interactionSymmetry')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Jerk Limit" value={config.jerkLimit} min={0} max={10} step={0.5} onChange={h('jerkLimit')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Pairwise Skip" value={config.pairwiseSkipChance} min={0} max={0.9} step={0.05} onChange={h('pairwiseSkipChance')} formatValue={v => v.toFixed(2)} />
+          </Collapsible>
+
+          <Collapsible title="Global Fields" defaultOpen={false}>
+            <Slider label="Gravity Well" value={config.gravityWell} min={0} max={5} step={0.1} onChange={h('gravityWell')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Gravity Radius" value={config.gravityWellRadius} min={100} max={10000} step={100} onChange={h('gravityWellRadius')} />
+            <Slider label="Vortex Strength" value={config.vortexStrength} min={0} max={3} step={0.05} onChange={h('vortexStrength')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Harmonic Strength" value={config.harmonicStrength} min={0} max={2} step={0.05} onChange={h('harmonicStrength')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Harmonic Range" value={config.harmonicRange} min={100} max={5000} step={50} onChange={h('harmonicRange')} />
+            <Slider label="Radial Drift" value={config.radialDrift} min={-1} max={1} step={0.05} onChange={h('radialDrift')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Repulsion Falloff" value={config.repulsionFalloff} min={0.5} max={4} step={0.1} onChange={h('repulsionFalloff')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Wander Rate" value={config.wanderRate} min={0} max={0.5} step={0.01} onChange={h('wanderRate')} formatValue={v => v.toFixed(2)} />
+          </Collapsible>
+
+          <Collapsible title="Env Forces" defaultOpen={false}>
+            <Slider label="Wind Strength" value={config.windStrength} min={0} max={10} step={0.1} onChange={h('windStrength')} formatValue={v => v.toFixed(1)} />
+            <Select label="Wind Dir °" value={String(config.windDir)} options={["0","45","90","135","180","225","270","315"]} onChange={(v) => h("windDir")(Number(v))} />
+            <Slider label="Radial Pulse Amp" value={config.radialPulseAmp} min={0} max={5} step={0.1} onChange={h('radialPulseAmp')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Radial Pulse Freq" value={config.radialPulseFreq} min={0.1} max={10} step={0.1} onChange={h('radialPulseFreq')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Tidal Strength" value={config.tidalStrength} min={0} max={3} step={0.1} onChange={h('tidalStrength')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Wave Force Amp" value={config.waveForceAmp} min={0} max={5} step={0.1} onChange={h('waveForceAmp')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Wave Freq" value={config.waveFreq} min={0.1} max={10} step={0.1} onChange={h('waveFreq')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Wave Speed" value={config.waveSpeed} min={0.1} max={10} step={0.1} onChange={h('waveSpeed')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Noise Field Strength" value={config.noiseFieldStrength} min={0} max={3} step={0.05} onChange={h('noiseFieldStrength')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Noise Field Scale" value={config.noiseFieldScale} min={0.001} max={0.1} step={0.001} onChange={h('noiseFieldScale')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Noise Drift" value={config.noiseDrift} min={0} max={1} step={0.05} onChange={h('noiseDrift')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Noise Octaves" value={config.noiseOctaves} min={1} max={6} step={1} onChange={h('noiseOctaves')} />
+          </Collapsible>
+
+          <Collapsible title="Edge / Boundary" defaultOpen={false}>
             <Select label="Edge Mode" value={config.edgeMode} options={['wrap', 'bounce', 'contain']} onChange={h('edgeMode')} />
-            <Slider label="Attract Force" value={config.attractForce} min={0.1} max={10} step={0.1} onChange={h('attractForce')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Attract Radius" value={config.attractRadius} min={10} max={1000} step={10} onChange={h('attractRadius')} />
-            <Slider label="Gravity Well" value={config.gravityWell != null ? config.gravityWell : 0} min={0} max={5} step={0.1} onChange={h('gravityWell')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Gravity Radius" value={config.gravityWellRadius != null ? config.gravityWellRadius : 2500} min={100} max={10000} step={100} onChange={h('gravityWellRadius')} />
-            <Slider label="Vortex Strength" value={config.vortexStrength != null ? config.vortexStrength : 0} min={0} max={3} step={0.05} onChange={h('vortexStrength')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Force Decay" value={config.forceDecayPower != null ? config.forceDecayPower : 2} min={0.5} max={4} step={0.1} onChange={h('forceDecayPower')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Force Jitter" value={config.interactionJitter != null ? config.interactionJitter : 0} min={0} max={1} step={0.01} onChange={h('interactionJitter')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Linear Drag" value={config.dragLinear != null ? config.dragLinear : 0} min={0} max={0.5} step={0.01} onChange={h('dragLinear')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Z Damping" value={config.velocityDampingZ != null ? config.velocityDampingZ : 0.82} min={0.1} max={0.99} step={0.01} onChange={h('velocityDampingZ')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Mass Variation" value={config.massVariation != null ? config.massVariation : 0} min={0} max={1} step={0.05} onChange={h('massVariation')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Bounce Restitution" value={config.bounceRestitution != null ? config.bounceRestitution : 0.5} min={0.1} max={1} step={0.05} onChange={h('bounceRestitution')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Boundary Repel" value={config.boundaryRepelForce != null ? config.boundaryRepelForce : 0} min={0} max={5} step={0.1} onChange={h('boundaryRepelForce')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Pairwise Cutoff" value={config.pairwiseCutoff != null ? config.pairwiseCutoff : 200} min={10} max={1000} step={10} onChange={h('pairwiseCutoff')} />
-            <Slider label="Matrix Drift" value={config.matrixDrift != null ? config.matrixDrift : 0} min={0} max={0.1} step={0.001} onChange={h('matrixDrift')} formatValue={v => v.toFixed(3)} />
-            <Slider label="Vel. Decay Angle" value={config.velocityDecayAngle != null ? config.velocityDecayAngle : 0} min={0} max={360} step={5} onChange={h('velocityDecayAngle')} />
-            <Slider label="Force Inertia" value={config.forceInertia != null ? config.forceInertia : 0} min={0} max={0.95} step={0.05} onChange={h('forceInertia')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Inter. Symmetry" value={config.interactionSymmetry != null ? config.interactionSymmetry : 0} min={0} max={1} step={0.05} onChange={h('interactionSymmetry')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Pairwise Skip" value={config.pairwiseSkipChance != null ? config.pairwiseSkipChance : 0} min={0} max={0.9} step={0.05} onChange={h('pairwiseSkipChance')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Center Bias" value={config.centerBias != null ? config.centerBias : 0} min={0} max={1} step={0.05} onChange={h('centerBias')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Boundary Warmth" value={config.boundaryWarmth != null ? config.boundaryWarmth : 0} min={0} max={2} step={0.05} onChange={h('boundaryWarmth')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Radial Drift" value={config.radialDrift != null ? config.radialDrift : 0} min={-1} max={1} step={0.05} onChange={h('radialDrift')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Noise Drift" value={config.noiseDrift != null ? config.noiseDrift : 0} min={0} max={1} step={0.05} onChange={h('noiseDrift')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Jerk Limit" value={config.jerkLimit != null ? config.jerkLimit : 0} min={0} max={10} step={0.1} onChange={h('jerkLimit')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Z Gravity" value={config.zGravity != null ? config.zGravity : 0} min={-0.1} max={0.1} step={0.005} onChange={h('zGravity')} formatValue={v => v.toFixed(3)} />
-            <Slider label="Glow Spread" value={config.glowSpread != null ? config.glowSpread : 1} min={0.5} max={5} step={0.1} onChange={h('glowSpread')} formatValue={v => v.toFixed(1)} />
-            <Slider label="HDR Exposure" value={config.hdrExposure != null ? config.hdrExposure : 1} min={0.5} max={3} step={0.05} onChange={h('hdrExposure')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Saturation Boost" value={config.saturationBoost != null ? config.saturationBoost : 0} min={0} max={1} step={0.05} onChange={h('saturationBoost')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Border Glow" value={config.borderGlow != null ? config.borderGlow : 0} min={0} max={1} step={0.05} onChange={h('borderGlow')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Trail Gap" value={config.trailGap != null ? config.trailGap : 1} min={1} max={10} step={1} onChange={h('trailGap')} />
-            <Slider label="Color Shift" value={config.colorShift != null ? config.colorShift : 0} min={0} max={360} step={5} onChange={h('colorShift')} />
-            <Slider label="Particle Contrast" value={config.particleContrast != null ? config.particleContrast : 1} min={0.5} max={2} step={0.05} onChange={h('particleContrast')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Star Twinkle" value={config.starTwinkle != null ? config.starTwinkle : 0.3} min={0} max={1} step={0.05} onChange={h('starTwinkle')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Min Speed" value={config.minSpeed != null ? config.minSpeed : 0} min={0} max={5} step={0.1} onChange={h('minSpeed')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Repulsion Falloff" value={config.repulsionFalloff != null ? config.repulsionFalloff : 1} min={0.5} max={4} step={0.1} onChange={h('repulsionFalloff')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Harmonic Strength" value={config.harmonicStrength != null ? config.harmonicStrength : 0} min={0} max={2} step={0.05} onChange={h('harmonicStrength')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Harmonic Range" value={config.harmonicRange != null ? config.harmonicRange : 1000} min={100} max={5000} step={100} onChange={h('harmonicRange')} />
-            <Slider label="Wander Rate" value={config.wanderRate != null ? config.wanderRate : 0} min={0} max={0.5} step={0.01} onChange={h('wanderRate')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Noise Field Scale" value={config.noiseFieldScale != null ? config.noiseFieldScale : 0.01} min={0.001} max={0.1} step={0.001} onChange={h('noiseFieldScale')} formatValue={v => v.toFixed(3)} />
-            <Slider label="Noise Field Strength" value={config.noiseFieldStrength != null ? config.noiseFieldStrength : 0} min={0} max={3} step={0.05} onChange={h('noiseFieldStrength')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Bounce Friction" value={config.bounceFriction != null ? config.bounceFriction : 0.3} min={0} max={1} step={0.05} onChange={h('bounceFriction')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Bounce Randomize" value={config.bounceRandomize != null ? config.bounceRandomize : 0} min={0} max={30} step={1} onChange={h('bounceRandomize')} />
-            <Slider label="Spawn Jitter" value={config.spawnJitter != null ? config.spawnJitter : 0.2} min={0} max={0.5} step={0.05} onChange={h('spawnJitter')} formatValue={v => v.toFixed(2)} />
-            <Slider label="World Margin" value={config.worldMargin != null ? config.worldMargin : 50} min={10} max={500} step={10} onChange={h('worldMargin')} />
-            <Toggle label="Velocity Clip" value={config.velocityClip > 0} onChange={h('velocityClip')} />
-            <Toggle label="Trails" value={config.trailsEnabled} onChange={h('trailsEnabled')} />
-            <Toggle label="Connections" value={config.connectionsEnabled} onChange={h('connectionsEnabled')} />
-            <Toggle label="Stats" value={config.showStats} onChange={h('showStats')} />
-            <Toggle label="Glow" value={config.showGlow} onChange={h('showGlow')} />
-            <button className="reset-btn" onClick={onReset}>↻ Reset</button>
+            <Slider label="Bounce Restitution" value={config.bounceRestitution} min={0.1} max={1} step={0.05} onChange={h('bounceRestitution')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Bounce Friction" value={config.bounceFriction} min={0} max={1} step={0.05} onChange={h('bounceFriction')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Bounce Randomize" value={config.bounceRandomize} min={0} max={30} step={1} onChange={h('bounceRandomize')} />
+            <Slider label="Boundary Repel" value={config.boundaryRepelForce} min={0} max={5} step={0.1} onChange={h('boundaryRepelForce')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Boundary Warmth" value={config.boundaryWarmth} min={0} max={2} step={0.05} onChange={h('boundaryWarmth')} formatValue={v => v.toFixed(2)} />
+            <Slider label="World Margin" value={config.worldMargin} min={10} max={500} step={10} onChange={h('worldMargin')} />
+            <Slider label="Surface Adhesion" value={config.surfaceAdhesion} min={0} max={1} step={0.05} onChange={h('surfaceAdhesion')} formatValue={v => v.toFixed(2)} />
           </Collapsible>
 
-          <Collapsible title="Performance" defaultOpen={false}>
-            <p style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6 }}>
-              Reduce settings below for lower-end devices.
-            </p>
-            <Slider label="Physics Rate" value={config.physicsRate} min={1} max={5} step={1} onChange={h('physicsRate')} formatValue={v => `1:${v}`} />
-            <Slider label="Render Quality" value={config.renderQuality} min={0.25} max={1} step={0.05} onChange={h('renderQuality')} formatValue={v => `${Math.round(v * 100)}%`} />
-            <Toggle label="Adaptive Quality" value={config.adaptiveQuality !== false} onChange={h('adaptiveQuality')} />
-            <p style={{ fontSize: 8, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>
-              Physics Rate 1:1 = full accuracy, 1:3 = runs physics every 3rd frame.<br/>
-              Render Quality scales glow, connections, and culling.
-            </p>
+          <Collapsible title="Z-Space" defaultOpen={false}>
+            <Slider label="Z Range" value={config.zRange} min={10} max={10000} step={50} onChange={h('zRange')} />
+            <Slider label="Stack Perspective" value={config.stackPerspective} min={0} max={10} step={0.5} onChange={h('stackPerspective')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Z Damping" value={config.velocityDampingZ} min={0.1} max={0.99} step={0.01} onChange={h('velocityDampingZ')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Z Gravity" value={config.zGravity} min={-0.1} max={0.1} step={0.005} onChange={h('zGravity')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Depth Cue" value={config.depthCue} min={0} max={1} step={0.05} onChange={h('depthCue')} formatValue={v => v.toFixed(2)} />
           </Collapsible>
 
-          <Collapsible title="World, Camera & XYZ" defaultOpen={false} >
-            <p style={{ fontSize: 9, color: 'var(--text-secondary)', marginBottom: 6 }}>
-              Z = [0, {zMax.toLocaleString()}] — persp² scale. 0=flat, 10=extreme.
-            </p>
-            <Slider label="World Width" value={config.worldWidth} min={200} max={10000} step={50} onChange={h('worldWidth')} />
-            <Slider label="World Height" value={config.worldHeight} min={200} max={10000} step={50} onChange={h('worldHeight')} />
-            <Slider label="Z Range (layers)" value={config.zRange} min={10} max={10000} step={10} onChange={h('zRange')} />
-            <Slider label="Stack Perspective" value={config.stackPerspective} min={0} max={10} step={0.01} onChange={h('stackPerspective')} formatValue={v => v.toFixed(2)} />
+          <Collapsible title="World" defaultOpen={false}>
+            <Slider label="World Width" value={config.worldWidth} min={200} max={10000} step={100} onChange={h('worldWidth')} />
+            <Slider label="World Height" value={config.worldHeight} min={200} max={10000} step={100} onChange={h('worldHeight')} />
             <Toggle label="Show Border" value={config.showWorldBorder} onChange={h('showWorldBorder')} />
-            <Slider label="Grid Opacity" value={config.gridOpacity != null ? config.gridOpacity : 0.15} min={0} max={0.5} step={0.01} onChange={h('gridOpacity')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Particle Opacity" value={config.particleOpacity != null ? config.particleOpacity : 1} min={0.2} max={1} step={0.05} onChange={h('particleOpacity')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Connection Opacity" value={config.connectionOpacity != null ? config.connectionOpacity : 0.08} min={0} max={0.5} step={0.005} onChange={h('connectionOpacity')} formatValue={v => v.toFixed(3)} />
-            <Slider label="Connection Width" value={config.connectionWidth != null ? config.connectionWidth : 0.4} min={0.1} max={3} step={0.1} onChange={h('connectionWidth')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Connection Fade" value={config.connectionFade != null ? config.connectionFade : 2} min={0.5} max={4} step={0.1} onChange={h('connectionFade')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Star Brightness" value={config.starBrightness != null ? config.starBrightness : 0.35} min={0} max={1} step={0.05} onChange={h('starBrightness')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Star Density" value={config.starDensity != null ? config.starDensity : 1} min={0.25} max={3} step={0.25} onChange={h('starDensity')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Depth Cue" value={config.depthCue != null ? config.depthCue : 0.5} min={0} max={1} step={0.05} onChange={h('depthCue')} formatValue={v => v.toFixed(2)} />
-            <Slider label="Min Radius" value={config.minRadius != null ? config.minRadius : 0.5} min={0.2} max={3} step={0.1} onChange={h('minRadius')} formatValue={v => v.toFixed(1)} />
-            <Slider label="Max Radius" value={config.maxRadius != null ? config.maxRadius : 12} min={3} max={20} step={0.5} onChange={h('maxRadius')} formatValue={v => v.toFixed(1)} />            <button className="reset-btn" onClick={onFitCamera}>⊞ Fit World</button>
           </Collapsible>
 
-          <Collapsible title="Initial Distribution" defaultOpen={false}>
+          <Collapsible title="Distribution" defaultOpen={false}>
             <Select label="Pattern" value={config.distributionMode} options={dists} onChange={h('distributionMode')} />
             <Select label="Velocity" value={config.initialVelocity} options={vels} onChange={h('initialVelocity')} />
             {config.distributionMode === 'cluster' && (
@@ -143,7 +120,115 @@ function Controls({
             {config.distributionMode === 'ring' && (
               <Slider label="Ring Radius" value={config.ringRadius} min={100} max={2500} step={50} onChange={h('ringRadius')} />
             )}
+            <Slider label="Spawn Jitter" value={config.spawnJitter} min={0} max={0.5} step={0.05} onChange={h('spawnJitter')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Center Bias" value={config.centerBias} min={0} max={1} step={0.05} onChange={h('centerBias')} formatValue={v => v.toFixed(2)} />
             <button className="reset-btn" onClick={onReset}>⟳ Re-distribute</button>
+          </Collapsible>
+
+          <Collapsible title="Social / Swarm" defaultOpen={false}>
+            <Slider label="Alignment Force" value={config.alignmentForce} min={0} max={3} step={0.05} onChange={h('alignmentForce')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Cohesion Force" value={config.cohesionForce} min={0} max={3} step={0.05} onChange={h('cohesionForce')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Separation Force" value={config.separationForce} min={0} max={5} step={0.1} onChange={h('separationForce')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Leader Influence" value={config.leaderInfluence} min={0} max={1} step={0.05} onChange={h('leaderInfluence')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Flock Radius" value={config.flockRadius} min={50} max={2000} step={50} onChange={h('flockRadius')} />
+            <Slider label="Herd Threshold" value={config.herdThreshold} min={1} max={50} step={1} onChange={h('herdThreshold')} />
+          </Collapsible>
+
+          <Collapsible title="Chem / Signalling" defaultOpen={false}>
+            <Slider label="Chem Decay" value={config.chemDecay} min={0} max={1} step={0.01} onChange={h('chemDecay')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Chem Diffusion" value={config.chemDiffusion} min={0} max={0.5} step={0.01} onChange={h('chemDiffusion')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Emission Rate" value={config.chemEmissionRate} min={0} max={1} step={0.01} onChange={h('chemEmissionRate')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Signal Threshold" value={config.signalThreshold} min={0} max={5} step={0.05} onChange={h('signalThreshold')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Signal Gain" value={config.signalGain} min={0} max={5} step={0.05} onChange={h('signalGain')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Signal Propagation" value={config.signalPropagation} min={0} max={3} step={0.1} onChange={h('signalPropagation')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Comm Range" value={config.commRange} min={50} max={2000} step={50} onChange={h('commRange')} />
+            <Slider label="Comm Bandwidth" value={config.commBandwidth} min={0} max={1} step={0.05} onChange={h('commBandwidth')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Signal Memory" value={config.signalMemory} min={0} max={100} step={1} onChange={h('signalMemory')} />
+          </Collapsible>
+
+          <Collapsible title="Energy / Growth" defaultOpen={false}>
+            <Slider label="Energy Decay" value={config.energyDecay} min={0} max={0.1} step={0.001} onChange={h('energyDecay')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Max Energy" value={config.maxEnergy} min={10} max={1000} step={10} onChange={h('maxEnergy')} />
+            <Slider label="Accretion Rate" value={config.accretionRate} min={0} max={0.1} step={0.001} onChange={h('accretionRate')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Merge Threshold" value={config.mergeThreshold} min={0.1} max={5} step={0.1} onChange={h('mergeThreshold')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Mass Absorption" value={config.massAbsorption} min={0} max={0.5} step={0.01} onChange={h('massAbsorption')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Critical Mass" value={config.criticalMass} min={2} max={100} step={1} onChange={h('criticalMass')} />
+          </Collapsible>
+
+          <Collapsible title="Reproduction" defaultOpen={false}>
+            <Slider label="Reproduction Rate" value={config.reproductionRate} min={0} max={0.1} step={0.001} onChange={h('reproductionRate')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Reprod Energy" value={config.reproductionEnergy} min={0} max={100} step={1} onChange={h('reproductionEnergy')} />
+            <Slider label="Reprod Cost" value={config.reproductionCost} min={1} max={100} step={1} onChange={h('reproductionCost')} />
+            <Slider label="Mutation Rate" value={config.mutationRate} min={0} max={0.5} step={0.01} onChange={h('mutationRate')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Inherit Traits" value={config.inheritTraits} min={0} max={1} step={0.05} onChange={h('inheritTraits')} formatValue={v => v.toFixed(2)} />
+          </Collapsible>
+
+          <Collapsible title="Matrix" defaultOpen={false}>
+            <Slider label="Matrix Drift" value={config.matrixDrift} min={0} max={0.1} step={0.005} onChange={h('matrixDrift')} formatValue={v => v.toFixed(3)} />
+            <p className="matrix-hint">
+              <strong style={{ color: '#ef4444' }}>Red</strong> repels · <strong style={{ color: '#38bdf8' }}>Blue</strong> attracts<br />Row → Column species
+            </p>
+            <MatrixGrid matrix={interactionMatrix} species={species} onChange={onMatrixChange} />
+          </Collapsible>
+
+          <Collapsible title="Touch" defaultOpen={false}>
+            <Slider label="Attract Force" value={config.attractForce} min={0.1} max={10} step={0.1} onChange={h('attractForce')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Attract Radius" value={config.attractRadius} min={10} max={1000} step={10} onChange={h('attractRadius')} />
+            <Slider label="Touch Deadzone" value={config.touchDeadzone} min={0} max={20} step={1} onChange={h('touchDeadzone')} />
+            <Slider label="Pinch Sensitivity" value={config.pinchSensitivity} min={0.1} max={3} step={0.1} onChange={h('pinchSensitivity')} formatValue={v => v.toFixed(1)} />
+          </Collapsible>
+
+          <Collapsible title="Camera" defaultOpen={false}>
+            <Slider label="Camera Smooth" value={config.cameraSmooth} min={0} max={1} step={0.05} onChange={h('cameraSmooth')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Camera Speed" value={config.cameraSpeed} min={0.5} max={10} step={0.5} onChange={h('cameraSpeed')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Zoom Min" value={config.zoomMin} min={0.01} max={0.5} step={0.01} onChange={h('zoomMin')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Zoom Max" value={config.zoomMax} min={2} max={50} step={1} onChange={h('zoomMax')} />
+            <button className="reset-btn" onClick={onFitCamera}>⊞ Fit World</button>
+          </Collapsible>
+
+          <Collapsible title="Quality / Perf" defaultOpen={false}>
+            <Slider label="Render Quality" value={config.renderQuality} min={0.25} max={1} step={0.05} onChange={h('renderQuality')} formatValue={v => v.toFixed(2)} />
+            <Slider label="FPS Cap" value={config.fpsCap} min={15} max={240} step={5} onChange={h('fpsCap')} />
+            <Slider label="Batch Size" value={config.batchSize} min={50} max={5000} step={50} onChange={h('batchSize')} />
+            <Slider label="Sim Updates / Frame" value={config.simUpdatesPerFrame} min={1} max={10} step={1} onChange={h('simUpdatesPerFrame')} />
+            <Toggle label="Adaptive Quality" value={config.adaptiveQuality} onChange={h('adaptiveQuality')} />
+          </Collapsible>
+
+          <Collapsible title="Visuals" defaultOpen={true}>
+            <Toggle label="Trails" value={config.trailsEnabled} onChange={h('trailsEnabled')} />
+            <Slider label="Trail Opacity" value={config.trailOpacity} min={0} max={0.2} step={0.002} onChange={h('trailOpacity')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Trail Gap" value={config.trailGap} min={1} max={10} step={1} onChange={h('trailGap')} />
+            <Toggle label="Glow" value={config.showGlow} onChange={h('showGlow')} />
+            <Slider label="Glow Intensity" value={config.glowIntensity} min={0} max={2} step={0.05} onChange={h('glowIntensity')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Glow Spread" value={config.glowSpread} min={0.5} max={4} step={0.1} onChange={h('glowSpread')} formatValue={v => v.toFixed(1)} />
+            <Slider label="HDR Exposure" value={config.hdrExposure} min={0.5} max={3} step={0.1} onChange={h('hdrExposure')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Saturation Boost" value={config.saturationBoost} min={0} max={2} step={0.05} onChange={h('saturationBoost')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Color Shift" value={config.colorShift} min={0} max={360} step={1} onChange={h('colorShift')} />
+            <Slider label="Particle Contrast" value={config.particleContrast} min={0.5} max={3} step={0.1} onChange={h('particleContrast')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Particle Opacity" value={config.particleOpacity} min={0.2} max={1} step={0.05} onChange={h('particleOpacity')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Min Radius" value={config.minRadius} min={0.2} max={3} step={0.1} onChange={h('minRadius')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Max Radius" value={config.maxRadius} min={3} max={20} step={0.5} onChange={h('maxRadius')} formatValue={v => v.toFixed(1)} />
+          </Collapsible>
+
+          <Collapsible title="Connections" defaultOpen={false}>
+            <Toggle label="Connections" value={config.connectionsEnabled} onChange={h('connectionsEnabled')} />
+            <Slider label="Connection Dist" value={config.connectionDistance} min={50} max={2500} step={25} onChange={h('connectionDistance')} />
+            <Slider label="Connection Opacity" value={config.connectionOpacity} min={0} max={0.5} step={0.01} onChange={h('connectionOpacity')} formatValue={v => v.toFixed(3)} />
+            <Slider label="Connection Width" value={config.connectionWidth} min={0.1} max={3} step={0.1} onChange={h('connectionWidth')} formatValue={v => v.toFixed(1)} />
+            <Slider label="Connection Fade" value={config.connectionFade} min={0.5} max={4} step={0.1} onChange={h('connectionFade')} formatValue={v => v.toFixed(1)} />
+          </Collapsible>
+
+          <Collapsible title="Stars" defaultOpen={false}>
+            <Slider label="Star Brightness" value={config.starBrightness} min={0} max={1} step={0.05} onChange={h('starBrightness')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Star Density" value={config.starDensity} min={0.25} max={3} step={0.25} onChange={h('starDensity')} formatValue={v => v.toFixed(2)} />
+            <Slider label="Star Twinkle" value={config.starTwinkle} min={0} max={1} step={0.05} onChange={h('starTwinkle')} formatValue={v => v.toFixed(2)} />
+            <Toggle label="Animate Bg" value={config.animateBackground} onChange={h('animateBackground')} />
+          </Collapsible>
+
+          <Collapsible title="Quick Actions" defaultOpen={true} badge="now">
+            <button className="reset-btn" onClick={onReset}>⟳ Re-distribute / Reset</button>
+            <button className="reset-btn" onClick={onFitCamera}>⊞ Fit World</button>
+            <Toggle label="Show Stats" value={config.showStats} onChange={h('showStats')} />
           </Collapsible>
 
           <Collapsible title="Species" defaultOpen={true} badge={`${species.length}`}>
@@ -167,13 +252,6 @@ function Controls({
                 <Slider label="Repulsion Strength" value={cur.repulsionStrength} min={0.1} max={3} step={0.05} onChange={sp(activeSpecies, 'repulsionStrength')} formatValue={v => v.toFixed(2)} />
               </div>
             )}
-          </Collapsible>
-
-          <Collapsible title="Interaction Matrix" defaultOpen={false} badge={`${species.length}×${species.length}`}>
-            <p className="matrix-hint">
-              <strong style={{ color: '#ef4444' }}>Red</strong> repels · <strong style={{ color: '#38bdf8' }}>Blue</strong> attracts<br />Row → Column species
-            </p>
-            <MatrixGrid matrix={interactionMatrix} species={species} onChange={onMatrixChange} />
           </Collapsible>
         </div>
       </div>

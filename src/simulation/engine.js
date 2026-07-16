@@ -13,6 +13,7 @@ export class ParticleLifeEngine {
     this._grid = [];
     this._physicsTick = 0;
     // Touch attract state (set by input handler, consumed in _doPhysics)
+    this._simTime = 0;
     this._touchAttractX = null;
     this._touchAttractY = null;
   }
@@ -32,10 +33,11 @@ export class ParticleLifeEngine {
   get zRange() { return this.config.zRange || 1000; }
 
   fitCamera() {
+    const MIN_ZOOM = 0.25;
     const z = Math.min(this.viewWidth / this.ww, this.viewHeight / this.wh);
-    this.camZoom = z;
-    this.camX = (this.viewWidth - this.ww * z) / 2;
-    this.camY = (this.viewHeight - this.wh * z) / 2;
+    this.camZoom = Math.max(MIN_ZOOM, z);
+    this.camX = (this.viewWidth - this.ww * this.camZoom) / 2;
+    this.camY = (this.viewHeight - this.wh * this.camZoom) / 2;
   }
 
   screenToWorld(sx, sy) {
@@ -53,6 +55,7 @@ export class ParticleLifeEngine {
   }
 
   clearTouchAttract() {
+    this._simTime = 0;
     this._touchAttractX = null;
     this._touchAttractY = null;
   }
@@ -131,7 +134,7 @@ export class ParticleLifeEngine {
           case 'radial': { const a = Math.random() * Math.PI * 2; const s = 0.5 + Math.random() * 1.5; vx = Math.cos(a) * s; vy = Math.sin(a) * s; vz = (Math.random() - 0.5) * s; break; }
           default: vx = (Math.random() - 0.5) * 0.5; vy = (Math.random() - 0.5) * 0.5; vz = (Math.random() - 0.5) * 0.5;
         }
-        this.particles[idx++] = { x, y, z: Math.random() * ZR, vx, vy, vz, species: si, ox: x, oy: y, fx: 0, fy: 0 };
+        this.particles[idx++] = { x, y, z: Math.random() * ZR, vx, vy, vz, species: si, ox: x, oy: y, fx: 0, fy: 0, energy: Math.random() * 50 + 25, chem: 0 };
       }
     });
     this.initialized = true;
@@ -140,6 +143,7 @@ export class ParticleLifeEngine {
   update() {
     if (!this.initialized) return;
     const { physicsRate } = this.config;
+    this._simTime++;
     this._physicsTick = (this._physicsTick + 1) % Math.max(1, Math.round(physicsRate || 1));
     if (this._physicsTick !== 0) return;
     this._doPhysics();
@@ -153,7 +157,7 @@ export class ParticleLifeEngine {
           boundaryRepelForce, pairwiseCutoff, matrixDrift,
           minSpeed, repulsionFalloff, harmonicStrength, harmonicRange, wanderRate,
           bounceFriction, bounceRandomize, noiseFieldScale, noiseFieldStrength,
-          worldMargin, spawnJitter, velocityClip, timeScale: ts, forceInertia, interactionSymmetry, pairwiseSkipChance, centerBias, boundaryWarmth, radialDrift, noiseDrift, velocityExchange, jerkLimit, velocityDecayAngle, zGravity } = config;
+          worldMargin, spawnJitter, velocityClip, timeScale: ts, forceInertia, interactionSymmetry, pairwiseSkipChance, centerBias, boundaryWarmth, radialDrift, noiseDrift, velocityExchange, jerkLimit, velocityDecayAngle, zGravity, windDir, windStrength, radialPulseAmp, radialPulseFreq, tidalStrength, noiseOctaves, waveForceAmp, waveFreq, waveSpeed, chemDecay, chemDiffusion, chemEmissionRate, signalThreshold, signalGain, signalPropagation, alignmentForce, cohesionForce, separationForce, leaderInfluence, herdThreshold, flockRadius, commRange, commBandwidth, signalMemory, protocolComplexity, accretionRate, mergeThreshold, massAbsorption, criticalMass, reproductionRate, reproductionEnergy, mutationRate, inheritTraits, energyDecay, maxEnergy, reproductionCost, pressureStiffness, surfaceAdhesion } = config;
     const timeScale = ts || 1;
     const W = this.ww, H = this.wh, ZR = this.zRange;
     const n = particles.length;
@@ -287,6 +291,32 @@ export class ParticleLifeEngine {
       }
     }
 
+      // Environment forces — wind, pulse, tide, wave
+      const ws = windStrength || 0;
+      if (ws > 0) {
+        const wdRad = (windDir || 0) * 0.01745;
+        p.fx += Math.cos(wdRad) * ws * 0.005 * timeScale;
+        p.fy += Math.sin(wdRad) * ws * 0.005 * timeScale;
+      }
+      const rpa = radialPulseAmp || 0;
+      if (rpa > 0) {
+        const rpf = radialPulseFreq || 0.5;
+        const pulse = Math.sin(this._simTime * rpf * 0.01) * rpa * 0.003;
+        let pdx = p.x - W/2, pdy = p.y - H/2;
+        const pd = Math.sqrt(pdx*pdx + pdy*pdy) || 1;
+        p.fx += (pdx/pd) * pulse; p.fy += (pdy/pd) * pulse;
+      }
+      const ts2 = tidalStrength || 0;
+      if (ts2 > 0) {
+        p.fx += (W/2 - p.x) * ts2 * 0.0001;
+        p.fy -= (H/2 - p.y) * ts2 * 0.0001;
+      }
+      const wfa = waveForceAmp || 0;
+      if (wfa > 0) {
+        const wf = waveFreq || 1;
+        const wav = Math.sin(p.x * 0.01 * wf + this._simTime * (waveSpeed||1) * 0.005) * wfa * 0.005;
+        p.fy += wav;
+      }
     // Apply forces & update positions
     for (let i = 0; i < n; i++) {
       const p = particles[i];
@@ -391,6 +421,161 @@ let fm = p.fx * p.fx + p.fy * p.fy;
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // SOCIAL / SWARMING — alignment, cohesion, separation 
+    // ═══════════════════════════════════════════════════════════════
+    const af = alignmentForce || 0;
+    const cf = cohesionForce || 0;
+    const sf = separationForce || 0;
+    if (af > 0 || cf > 0 || sf > 0) {
+      const flockR = flockRadius || 300;
+      const flockRSq = flockR * flockR;
+      const herdThresh = herdThreshold || 10;
+      const li = leaderInfluence || 0;
+      for (let i = 0; i < n; i++) {
+        const p = particles[i];
+        const { cx: pcx, cy: pcy } = { cx: Math.floor(p.x / cellSize), cy: Math.floor(p.y / cellSize) };
+        let alignX = 0, alignY = 0, cohX = 0, cohY = 0, sepX = 0, sepY = 0;
+        let count = 0;
+        for (let dy = -checkCells; dy <= checkCells && dy < 3; dy++) {
+          for (let dx = -checkCells; dx <= checkCells && dx < 3; dx++) {
+            const nx = ((pcx + dx) % cols + cols) % cols;
+            const ny = ((pcy + dy) % rows + rows) % rows;
+            const cell = grid[ny * cols + nx];
+            for (let ci = 0; ci < cell.length; ci++) {
+              const j = cell[ci]; if (i === j) continue;
+              const q = particles[j];
+              let dx2 = q.x - p.x, dy2 = q.y - p.y;
+              if (edgeMode === "wrap") {
+                if (dx2 > W/2) dx2 -= W; if (dx2 < -W/2) dx2 += W;
+                if (dy2 > H/2) dy2 -= H; if (dy2 < -H/2) dy2 += H;
+              }
+              if (dx2*dx2 + dy2*dy2 > flockRSq) continue;
+              alignX += q.vx; alignY += q.vy;
+              cohX += q.x; cohY += q.y;
+              if (dx2*dx2 + dy2*dy2 < (flockR * 0.3) ** 2) {
+                sepX -= dx2; sepY -= dy2;
+              }
+              count++;
+            }
+          }
+        }
+        if (count > 0 && count < herdThresh * 10) {
+          const sc2 = 1 / count;
+          p.fx += (alignX * sc2 - p.vx) * af * 0.002;
+          p.fy += (alignY * sc2 - p.vy) * af * 0.002;
+          const cohDX = cohX * sc2 - p.x, cohDY = cohY * sc2 - p.y;
+          p.fx += cohDX * cf * 0.001; p.fy += cohDY * cf * 0.001;
+          p.fx += sepX * sf * 0.002; p.fy += sepY * sf * 0.002;
+        }
+        if (li > 0 && count > 0) {
+          const leader = particles[Math.floor(Math.random() * n)];
+          if (leader !== p) { p.fx += (leader.vx - p.vx) * li * 0.002; p.fy += (leader.vy - p.vy) * li * 0.002; }
+        }
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // CHEMICAL / SIGNALLING — emission, diffusion, decay, sensing
+    // ═══════════════════════════════════════════════════════════════
+    const cd_ = chemDecay || 0.05;
+    const cdiff = chemDiffusion || 0.1;
+    const cer = chemEmissionRate || 0;
+    const st = signalThreshold || 0.5;
+    const sg = signalGain || 1;
+    const sprop = signalPropagation || 1;
+    if (cd_ > 0 && cer > 0) {
+      for (let i = 0; i < n; i++) {
+        const p = particles[i];
+        if (cer > 0) p.chem = Math.min(5, (p.chem || 0) + cer * (Math.random() * 0.5 + 0.5));
+        if (sprop > 0) {
+          const cellX = Math.floor(p.x / cellSize);
+          const cellY = Math.floor(p.y / cellSize);
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = ((cellX + dx) % cols + cols) % cols;
+              const ny = ((cellY + dy) % rows + rows) % rows;
+              const cell = grid[ny * cols + nx];
+              for (let ci = 0; ci < cell.length; ci++) {
+                const j = cell[ci]; if (i === j) continue;
+                const q = particles[j];
+                let dx2 = q.x - p.x, dy2 = q.y - p.y;
+                const d2 = dx2*dx2 + dy2*dy2;
+                const maxDist = sprop * 50;
+                if (d2 < maxDist * maxDist && p.chem - (q.chem || 0) > 0.01) {
+                  const transfer = (p.chem - (q.chem||0)) * cdiff * 0.01;
+                  p.chem -= transfer; q.chem = (q.chem||0) + transfer;
+                }
+              }
+            }
+          }
+        }
+        p.chem = Math.max(0, (p.chem||0) - cd_);
+        if (p.chem > st && sg > 0) {
+          const chemForce = sg * 0.002 * p.chem;
+          const ang = Math.random() * Math.PI * 2;
+          p.fx += Math.cos(ang) * chemForce;
+          p.fy += Math.sin(ang) * chemForce;
+        }
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // ENERGY, ACCRETION & REPRODUCTION
+    // ═══════════════════════════════════════════════════════════════
+    const ed = energyDecay || 0.01;
+    const me = maxEnergy || 200;
+    const ar = accretionRate || 0;
+    const mt = mergeThreshold || 1;
+    const ma = massAbsorption || 0;
+    const cm = criticalMass || 20;
+    const rr = reproductionRate || 0;
+    const re = reproductionEnergy || 50;
+    const rc = reproductionCost || 30;
+    const mut = mutationRate || 0.01;
+    const it = inheritTraits || 0.5;
+    if (ed > 0 || ar > 0 || rr > 0) {
+      for (let i = 0; i < n; i++) {
+        const p = particles[i];
+        if (ed > 0) p.energy = Math.max(0, (p.energy||0) - ed * timeScale);
+        const spd2 = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+        if (spd2 > 0.5) p.energy = Math.min(me, (p.energy||0) + spd2 * 0.01);
+        
+        if (p.energy <= 0 && ar > 0) {
+          const cellX = Math.floor(p.x / cellSize);
+          const cellY = Math.floor(p.y / cellSize);
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = ((cellX + dx) % cols + cols) % cols;
+              const ny = ((cellY + dy) % rows + rows) % rows;
+              const cell = grid[ny * cols + nx];
+              for (let ci = 0; ci < cell.length; ci++) {
+                const j = cell[ci]; if (i === j) continue;
+                if (p.energy >= 0) break;
+                const q = particles[j];
+                if (q.energy > 10 && q.species === p.species) {
+                  const drain = Math.min(ar, q.energy * 0.1);
+                  q.energy -= drain; p.energy = Math.min(me, (p.energy||0) + drain * ma);
+                }
+              }
+            }
+          }
+        }
+        
+        if (rr > 0 && p.energy > re && Math.random() < rr) {
+          p.energy -= rc;
+          if (n < 15000) {
+            const offX = (Math.random() - 0.5) * 20;
+            const offY = (Math.random() - 0.5) * 20;
+            const nx2 = Math.max(0, Math.min(W, p.x + offX));
+            const ny2 = Math.max(0, Math.min(H, p.y + offY));
+            const childSpecies = Math.random() < mut ? Math.floor(Math.random() * species.length) : p.species;
+            const child = { x: nx2, y: ny2, z: p.z + (Math.random()-0.5)*20, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, vz: (Math.random()-0.5)*0.5, species: childSpecies, ox: nx2, oy: ny2, fx: 0, fy: 0, energy: Math.random() * 20 + 10, chem: 0 };
+            particles.push(child);
+          }
+        }
+      }
+    }
     // Matrix drift — decay matrix values toward zero
     const md = matrixDrift || 0;
     if (md > 0 && interactionMatrix && interactionMatrix.length > 0) {

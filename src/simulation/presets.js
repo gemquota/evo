@@ -95,26 +95,103 @@ export const PRESETS = [
 export const DEFAULT_CONFIG = {
   species: PRESETS[0].species,
   interactionMatrix: PRESETS[0].interactionMatrix,
-  friction: 0.82, trailOpacity: 0.03, timeScale: 1.0, maxForce: 3.0, noiseAmount: 0.04,
-  edgeMode: 'wrap',
+
+  // Dynamics
+  friction: 0.82, timeScale: 1.0, maxForce: 3.0, noiseAmount: 0.04,
+  minSpeed: 0, dragLinear: 0, physicsRate: 1,
+  velocityDampingZ: 0.82, velocityClip: 0, massVariation: 0,
+
+  // Forces
+  gravityWell: 0, gravityWellRadius: 2500, vortexStrength: 0,
+  forceDecayPower: 2, interactionJitter: 0,
+  harmonicStrength: 0, harmonicRange: 1000,
+  repulsionFalloff: 1, wanderRate: 0,
   attractForce: 2.0, attractRadius: 300,
-  trailsEnabled: true, connectionsEnabled: false, connectionDistance: 600,
-  showStats: true, showGlow: true, glowIntensity: 1.0,
-  worldWidth: 2500, worldHeight: 1406, showWorldBorder: true,
+  noiseFieldScale: 0.01, noiseFieldStrength: 0,
+
+  // Boundary
+  edgeMode: 'wrap',
+  bounceRestitution: 0.5, bounceFriction: 0.3, bounceRandomize: 0,
+  boundaryRepelForce: 0, worldMargin: 50, pairwiseCutoff: 200,
+
+  // World
+  worldWidth: 2500, worldHeight: 1406, zRange: 10000,
+  stackPerspective: 2,
+
+  // Distribution
   distributionMode: 'random', initialVelocity: 'random',
   clusterCount: 8, clusterSpread: 400, ringRadius: 1000,
-  zRange: 10000, stackPerspective: 2,
-  physicsRate: 1, renderQuality: 1,
-  gravityWell: 0, gravityWellRadius: 2500, vortexStrength: 0,
-  bounceRestitution: 0.5, massVariation: 0, forceDecayPower: 2,
-  interactionJitter: 0, velocityDampingZ: 0.82, dragLinear: 0,
-  boundaryRepelForce: 0, pairwiseCutoff: 200, matrixDrift: 0,
-  connectionOpacity: 0.08, connectionWidth: 0.4, connectionFade: 2,
+  spawnJitter: 0.2, centerBias: 0,
+
+  // Advanced Physics
+  forceInertia: 0, interactionSymmetry: 0, pairwiseSkipChance: 0,
+  boundaryWarmth: 0, radialDrift: 0, noiseDrift: 0,
+  jerkLimit: 0, zGravity: 0, velocityExchange: 0,
+  velocityDecayAngle: 0, matrixDrift: 0,
+
+  // Environment Forces
+  windDir: 0, windStrength: 0, radialPulseAmp: 0, radialPulseFreq: 0.5,
+  tidalStrength: 0, noiseOctaves: 2, waveForceAmp: 0, waveFreq: 1, waveSpeed: 1,
+
+  // Chemical / Signalling
+  chemDecay: 0.05, chemDiffusion: 0.1, chemEmissionRate: 0,
+  signalThreshold: 0.5, signalGain: 1, signalPropagation: 1,
+
+  // Reproduction & Genetics
+  reproductionRate: 0, reproductionEnergy: 50, mutationRate: 0.01,
+  inheritTraits: 0.5, energyDecay: 0.01, maxEnergy: 200, reproductionCost: 30,
+
+  // Accretion / Merging
+  accretionRate: 0, mergeThreshold: 1, massAbsorption: 0, criticalMass: 20,
+
+  // Social / Swarming
+  alignmentForce: 0, cohesionForce: 0, separationForce: 0,
+  leaderInfluence: 0, herdThreshold: 10, flockRadius: 300,
+
+  // Lingual / Communication
+  commRange: 200, commBandwidth: 0, signalMemory: 0, protocolComplexity: 0,
+
+  // Genetic Evolution
+  genePoolSize: 100, crossoverRate: 0.1, selectionPressure: 0.5,
+  fitnessDecay: 0.01, adaptationRate: 0.01,
+
+  // Rendering
+  trailOpacity: 0.03, glowIntensity: 1.0,
+  connectionDistance: 600, connectionOpacity: 0.08,
+  connectionWidth: 0.4, connectionFade: 2,
+  glowSpread: 1, hdrExposure: 1, saturationBoost: 0, borderGlow: 0,
+  trailGap: 1, colorShift: 0, particleContrast: 1,
   starBrightness: 0.35, starDensity: 1, depthCue: 0.5,
-  minRadius: 0.5, maxRadius: 12, minSpeed: 0,
-  repulsionFalloff: 1, harmonicStrength: 0, harmonicRange: 1000,
-  wanderRate: 0, bounceFriction: 0.3, bounceRandomize: 0,
-  noiseFieldScale: 0.01, noiseFieldStrength: 0, worldMargin: 50,
-  spawnJitter: 0.2, velocityClip: 0,
-  gridOpacity: 0.15, particleOpacity: 1.0,
+  minRadius: 0.5, maxRadius: 12, gridOpacity: 0.15,
+  particleOpacity: 1.0,
+
+  // Rendering toggles
+  trailsEnabled: true, connectionsEnabled: false, showStats: true,
+  showGlow: true, adaptiveQuality: true, showWorldBorder: true,
+  showGrid: false, showBorder: true, showFPS: true,
+  showSpeciesLabels: false, animateBackground: true,
+
+  // Quality
+  renderQuality: 1, fpsCap: 60, frameSkip: 0, batchSize: 500,
+  simUpdatesPerFrame: 1, dynamicResMin: 0.5,
+
+  // Camera
+  cameraSmooth: 0.3, cameraSpeed: 2, touchDeadzone: 5,
+  zoomMin: 0.01, zoomMax: 20, pinchSensitivity: 1,
+
+  // Misc
+  deterministicMode: false, autoSave: false, autoSaveInterval: 0,
+  maxUndo: 10, logLevel: 'info', enableTelemetry: false, devMode: false,
+
+  // HUD
+  HUDOpacity: 0.8, HUDScale: 1,
+
+  // Theme
+  theme: 'dark', backgroundColor: '#05050a', backgroundColorDark: '#000008',
+  clearColor: '#08081a',
+
+  // Boundary Material
+  pressureStiffness: 1, surfaceAdhesion: 0,
+  wallElasticityLeft: 1, wallElasticityRight: 1,
+  wallElasticityTop: 1, wallElasticityBottom: 1,
 };

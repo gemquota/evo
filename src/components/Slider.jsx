@@ -88,11 +88,15 @@ export function Select({ label, value, options, onChange }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt.charAt(0).toUpperCase() + opt.slice(1)}
-          </option>
-        ))}
+        {options.map((opt) => {
+          const optValue = typeof opt === 'object' ? opt.value : opt;
+          const optLabel = typeof opt === 'object' ? opt.label : (opt.charAt(0).toUpperCase() + opt.slice(1));
+          return (
+            <option key={optValue} value={optValue}>
+              {optLabel}
+            </option>
+          );
+        })}
       </select>
     </div>
   );

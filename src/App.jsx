@@ -15,7 +15,7 @@ import './App.css';
 function buildInitConfig() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const maxDim = 10000;
+  const maxDim = 2500;
   const scale = maxDim / Math.max(vw, vh);
   return validateGlobal({
     ...DEFAULT_CONFIG,
