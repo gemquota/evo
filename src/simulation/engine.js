@@ -2,6 +2,40 @@
 
 export class ParticleLifeEngine {
   constructor(width, height, config) {
+    if (!config || !config.species || !config.species.length) {
+      config = {
+        worldWidth: 2500, worldHeight: 1406, zRange: 10000, friction: 0.78,
+        timeScale: 1.0, maxForce: 4.0, noiseAmount: 0.12, edgeMode: "wrap",
+        stackPerspective: 2, velocityDampingZ: 0.82,
+        gravityWell: 0.3, vortexStrength: 0.2, forceDecayPower: 1.5,
+        chemDecay: 0.015, chemDiffusion: 0.25, chemEmissionRate: 0.4,
+        signalThreshold: 0.2, signalGain: 2.5, signalPropagation: 1.5,
+        reproductionRate: 0.02, energyDecay: 0.008, maxEnergy: 250, reproductionCost: 20,
+        alignmentForce: 0.3, cohesionForce: 0.2, separationForce: 0.5,
+        matrixDrift: 0.002, attractionForce: 0.15,
+        windStrength: 0.2, radialPulseAmp: 0.3, waveForceAmp: 0.2,
+        massVariation: 0.3, boundaryWarmth: 0.3, radialDrift: 0.02,
+        noiseFieldStrength: 0.5, wanderRate: 0.02,
+        distributionMode: "random", initialVelocity: "random",
+        bounceRestitution: 0.5, bounceFriction: 0.3,
+        boundaryRepelForce: 0, worldMargin: 50, pairwiseCutoff: 200,
+        clusterCount: 5, clusterSpread: 200, spawnJitter: 0.2,
+        species: [
+          {name: "Cyan", count: 240, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60},
+          {name: "Magenta", count: 160, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55},
+          {name: "Lime", count: 300, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65},
+          {name: "Gold", count: 100, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50},
+          {name: "Coral", count: 200, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55}
+        ],
+        interactionMatrix: [
+          [0.2, 0.8, -0.7, 0.3, -0.5],
+          [-0.9, 0.1, 0.7, -0.6, 0.8],
+          [0.5, -0.8, 0.1, 0.9, -0.4],
+          [-0.6, 0.4, -0.9, 0.1, 0.7],
+          [0.3, -0.7, 0.5, -0.8, 0.0]
+        ],
+      };
+    }
     this.viewWidth = width;
     this.viewHeight = height;
     this.config = { ...config };
@@ -124,6 +158,7 @@ export class ParticleLifeEngine {
           }
           default:
             const cb = centerBias || 0; if (cb > 0) { const ca = Math.random() * Math.PI * 2; const cr = Math.random() * cb * Math.min(W, H) * 0.4; x = W/2 + Math.cos(ca) * cr; y = H/2 + Math.sin(ca) * cr; } else { x = Math.random() * W; y = Math.random() * H; }
+    if (!species || !species.length || !interactionMatrix) { return; }
         }
         x = Math.max(0, Math.min(W, x)); y = Math.max(0, Math.min(H, y));
         let vx, vy, vz;
@@ -237,7 +272,9 @@ export class ParticleLifeEngine {
             } else {
               const t = (d - minR) / (maxRi - minR);
               const decPow = forceDecayPower != null ? forceDecayPower : 2;
-              const g = (isym > 0 && interactionMatrix[q.species] ? interactionMatrix[p.species].map((v,idx) => (v + interactionMatrix[q.species][idx]) / 2 * isym + v * (1 - isym)) : interactionMatrix[p.species])[q.species] * Math.pow(1 - t, decPow);
+              const matRow = interactionMatrix && interactionMatrix[p.species] ? interactionMatrix[p.species] : null;
+              const matVal = matRow && matRow.length > q.species ? matRow[q.species] : 0;
+              const g = matVal * Math.pow(1 - t, decPow);
               const ij = interactionJitter || 0;
               if (ij > 0) { const jn = (Math.random() - 0.5) * ij * 0.5; fx += g * dxp * inv + jn * dxp * inv; fy += g * dyp * inv + jn * dyp * inv; }
               else { fx += g * dxp * inv; fy += g * dyp * inv; }
