@@ -153,7 +153,7 @@ export class ParticleLifeEngine {
           boundaryRepelForce, pairwiseCutoff, matrixDrift,
           minSpeed, repulsionFalloff, harmonicStrength, harmonicRange, wanderRate,
           bounceFriction, bounceRandomize, noiseFieldScale, noiseFieldStrength,
-          worldMargin, spawnJitter, velocityClip, timeScale: ts, forceInertia, interactionSymmetry, pairwiseSkipChance, centerBias, boundaryWarmth, radialDrift, noiseDrift, velocityExchange, jerkLimit, zGravity } = config;
+          worldMargin, spawnJitter, velocityClip, timeScale: ts, forceInertia, interactionSymmetry, pairwiseSkipChance, centerBias, boundaryWarmth, radialDrift, noiseDrift, velocityExchange, jerkLimit, velocityDecayAngle, zGravity } = config;
     const timeScale = ts || 1;
     const W = this.ww, H = this.wh, ZR = this.zRange;
     const n = particles.length;
