@@ -2,11 +2,11 @@
 
 function baseSpecies() {
   return [
-    { name: 'Cyan', count: 1000, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
-    { name: 'Magenta', count: 1000, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
-    { name: 'Lime', count: 1000, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
-    { name: 'Gold', count: 1000, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
-    { name: 'Coral', count: 1000, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
+    { name: "Cyan", count: 1200, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
+    { name: "Magenta", count: 800, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
+    { name: "Lime", count: 1500, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
+    { name: "Gold", count: 500, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
+    { name: "Coral", count: 1000, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
   ];
 }
 
@@ -21,11 +21,11 @@ function preset(species, matrix, global) {
 export const PRESETS = [
   // Spiralis — rotating spirals and orbiting clusters
   preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 1.0) })), [
-    [ 0.0,  0.7, -0.4,  0.3, -0.2],
-    [-0.3,  0.0,  0.8, -0.5,  0.4],
-    [ 0.4, -0.5,  0.0,  0.7, -0.3],
-    [-0.2,  0.4, -0.6,  0.0,  0.6],
-    [ 0.3, -0.3,  0.2, -0.5,  0.0],
+    [ 0.0,  0.5, -0.6,  0.4, -0.3],
+    [-0.8,  0.0,  0.9, -0.7,  0.5],
+    [ 0.6, -0.9,  0.0,  0.8, -0.4],
+    [-0.5,  0.7, -0.8,  0.0,  0.6],
+    [ 0.3, -0.5,  0.4, -0.6,  0.0],
   ], { friction: 0.82, trailOpacity: 0.03, timeScale: 1.0, maxForce: 3.0, noiseAmount: 0.04, name: '🌀 Spiralis', desc: 'Rotating spirals and orbiting clusters' }),
 
   // Primordia — cell-like structures dividing and merging
@@ -97,7 +97,7 @@ export const DEFAULT_CONFIG = {
   interactionMatrix: PRESETS[0].interactionMatrix,
 
   // Dynamics
-  friction: 0.82, timeScale: 1.0, maxForce: 3.0, noiseAmount: 0.04,
+  friction: 0.75, timeScale: 1.2, maxForce: 3.5, noiseAmount: 0.08,
   minSpeed: 0, dragLinear: 0, physicsRate: 1,
   velocityDampingZ: 0.82, velocityClip: 0, massVariation: 0,
 
@@ -134,15 +134,15 @@ export const DEFAULT_CONFIG = {
   tidalStrength: 0, noiseOctaves: 2, waveForceAmp: 0, waveFreq: 1, waveSpeed: 1,
 
   // Chemical / Signalling
-  chemDecay: 0.05, chemDiffusion: 0.1, chemEmissionRate: 0,
-  signalThreshold: 0.5, signalGain: 1, signalPropagation: 1,
+  chemDecay: 0.02, chemDiffusion: 0.2, chemEmissionRate: 0.3,
+  signalThreshold: 0.3, signalGain: 2, signalPropagation: 1.5,
 
   // Reproduction & Genetics
-  reproductionRate: 0, reproductionEnergy: 50, mutationRate: 0.01,
-  inheritTraits: 0.5, energyDecay: 0.01, maxEnergy: 200, reproductionCost: 30,
+  reproductionRate: 0.025, reproductionEnergy: 30, mutationRate: 0.02,
+  inheritTraits: 0.5, energyDecay: 0.01, maxEnergy: 200, reproductionCost: 15,
 
   // Accretion / Merging
-  accretionRate: 0, mergeThreshold: 1, massAbsorption: 0, criticalMass: 20,
+  accretionRate: 0.01, mergeThreshold: 0.5, massAbsorption: 0.2, criticalMass: 15,
 
   // Social / Swarming
   alignmentForce: 0, cohesionForce: 0, separationForce: 0,
@@ -156,18 +156,18 @@ export const DEFAULT_CONFIG = {
   fitnessDecay: 0.01, adaptationRate: 0.01,
 
   // Rendering
-  trailOpacity: 0.03, glowIntensity: 1.0,
-  connectionDistance: 600, connectionOpacity: 0.08,
-  connectionWidth: 0.4, connectionFade: 2,
-  glowSpread: 1, hdrExposure: 1, saturationBoost: 0, borderGlow: 0,
+  trailOpacity: 0.002, glowIntensity: 0,
+  connectionDistance: 2500, connectionOpacity: 0.5,
+  connectionWidth: 1.5, connectionFade: 1,
+  glowSpread: 1, hdrExposure: 1.5, saturationBoost: 0.3, borderGlow: 0,
   trailGap: 1, colorShift: 0, particleContrast: 1,
   starBrightness: 0.35, starDensity: 1, depthCue: 0.5,
   minRadius: 0.5, maxRadius: 12, gridOpacity: 0.15,
   particleOpacity: 1.0,
 
   // Rendering toggles
-  trailsEnabled: true, connectionsEnabled: false, showStats: true,
-  showGlow: true, adaptiveQuality: true, showWorldBorder: true,
+  trailsEnabled: true, connectionsEnabled: true, showStats: true,
+  showGlow: false, adaptiveQuality: true, showWorldBorder: true,
   showGrid: false, showBorder: true, showFPS: true,
   showSpeciesLabels: false, animateBackground: true,
 
