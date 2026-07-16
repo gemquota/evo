@@ -160,7 +160,7 @@ export const DEFAULT_CONFIG = {
   connectionDistance: 2500, connectionOpacity: 0.5,
   connectionWidth: 1.5, connectionFade: 1,
   glowSpread: 1, hdrExposure: 1.8, saturationBoost: 0.3, borderGlow: 0,
-  trailGap: 3, colorShift: 0, particleContrast: 1.3,
+  trailGap: 1, colorShift: 0, particleContrast: 1.3,
   starBrightness: 0.35, starDensity: 1, depthCue: 0.5,
   minRadius: 0.5, maxRadius: 12, gridOpacity: 0.15,
   particleOpacity: 1.0,

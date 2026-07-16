@@ -289,9 +289,6 @@ export class ParticleLifeEngine {
           p.fy += hf * hdy / hd;
         }
       }
-    }
-
-      // Environment forces — wind, pulse, tide, wave
       const ws = windStrength || 0;
       if (ws > 0) {
         const wdRad = (windDir || 0) * 0.01745;
@@ -317,6 +314,9 @@ export class ParticleLifeEngine {
         const wav = Math.sin(p.x * 0.01 * wf + this._simTime * (waveSpeed||1) * 0.005) * wfa * 0.005;
         p.fy += wav;
       }
+
+    }
+
     // Apply forces & update positions
     for (let i = 0; i < n; i++) {
       const p = particles[i];
