@@ -100,6 +100,7 @@ export default function App() {
     },
     [config, interactionMatrix, species, sim.engineRef, sim.rendererRef]
   );
+  const handleTogglePanel = useCallback(() => setPanelOpen((p) => !p), []);
 
   const { fps, particleCount, frameTime, visibleCount, speciesCounts } = sim.simStats;
 
@@ -155,7 +156,7 @@ export default function App() {
         onReset={sim.handleReset}
         particleCount={particleCount}
         panelOpen={panelOpen}
-        onTogglePanel={() => setPanelOpen((p) => !p)}
+        onTogglePanel={handleTogglePanel}
         onFitCamera={sim.handleFitCamera}
       />
 

@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parameters — Synthetic Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #05050a;
+  --surface: #0c0c1a;
+  --border: rgba(255,255,255,0.06);
+  --text: #eeeef8;
+  --text2: #9999b8;
+  --text3: #555570;
+  --accent: #6c5ce7;
+  --cyan: #22d3ee;
+  --magenta: #d946ef;
+  --green: #4ade80;
+  --red: #f87171;
+  --gold: #fbbf24;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font: 'Bricolage Grotesque', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); padding: 24px;
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+.header { margin-bottom: 32px; }
+.header h1 {
+  font-size: 20px; font-weight: 700;
+  background: linear-gradient(135deg, #c084fc, #22d3ee);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header .sub {
+  font-size: 12px; color: var(--text3);
+  font-family: var(--mono); margin-top: 4px;
+}
+.toolbar {
+  display: flex; gap: 12px; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.search-box {
+  flex: 1; min-width: 200px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 14px;
+  color: var(--text); font-family: var(--mono); font-size: 12px;
+  outline: none; transition: border-color 0.2s;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--text3); }
+.search-wrap { display: flex; align-items: center; gap: 0; flex: 1; min-width: 200px; position: relative; }
+.search-clear {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--text3); font-size: 12px;
+  cursor: pointer; padding: 4px; line-height: 1;
+  display: none; transition: color 0.15s;
+}
+.search-clear:hover { color: var(--text); }
+.search-box:not(:placeholder-shown) ~ .search-clear { display: block; }
+.filter-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.filter-group.expanded { gap: 4px; }
+.filter-group-live { margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--border); }
+.filter-label { font-size: 9px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 2px; }
+.filter-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+  color: var(--text2); font-family: var(--font); font-size: 10px;
+  font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover { border-color: rgba(255,255,255,0.15); color: var(--text); }
+.filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(108,92,231,0.1); }
+.filter-btn.imp-3-btn { border-color: rgba(248,113,113,0.3); color: #f87171; }
+.filter-btn.imp-3-btn.active, .filter-btn.imp-3-btn:hover { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.1); }
+.filter-btn.imp-2-btn { border-color: rgba(251,146,60,0.3); color: #fb923c; }
+.filter-btn.imp-2-btn.active, .filter-btn.imp-2-btn:hover { border-color: #fb923c; color: #fb923c; background: rgba(251,146,60,0.1); }
+.filter-btn.imp-1-btn { border-color: rgba(250,204,21,0.3); color: #facc15; }
+.filter-btn.imp-1-btn.active, .filter-btn.imp-1-btn:hover { border-color: #facc15; color: #facc15; background: rgba(250,204,21,0.1); }
+.filter-btn.imp-0-btn { border-color: rgba(74,222,128,0.3); color: #4ade80; }
+.filter-btn.imp-0-btn.active, .filter-btn.imp-0-btn:hover { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.1); }
+.filter-help-wrap { position: relative; display: inline-flex; align-items: center; }
+.filter-help-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 50%; width: 24px; height: 24px;
+  color: var(--text3); font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.filter-help-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-tooltip {
+  display: none; position: absolute; top: 100%; right: 0; margin-top: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 18px; min-width: 240px;
+  font-size: 11px; color: var(--text2); line-height: 1.7; z-index: 100;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.filter-tooltip.show { display: block; }
+.filter-tooltip strong { color: var(--text); }
+.filter-tooltip b { color: var(--text); }
+.summary {
+  display: flex; gap: 16px; margin-bottom: 24px;
+  font-family: var(--mono); font-size: 11px; color: var(--text3); flex-wrap: wrap;
+}
+.summary span { white-space: nowrap; }
+.summary .num { color: var(--text2); font-weight: 600; }
+
+.super { margin-bottom: 8px; }
+.super-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  transition: all 0.15s; user-select: none;
+}
+.super-header:hover { border-color: rgba(255,255,255,0.12); }
+.super-header .arrow {
+  font-size: 10px; color: var(--text3);
+  transition: transform 0.2s; flex-shrink: 0;
+}
+.super-header.open .arrow { transform: rotate(90deg); }
+.super-header .label {
+  font-size: 14px; font-weight: 600;
+  background: linear-gradient(135deg, #c084fc, #22d3ee);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.super-header .count {
+  margin-left: auto; font-family: var(--mono);
+  font-size: 10px; color: var(--text3);
+}
+.super-body { display: none; padding: 8px 0 8px 20px; }
+.super-body.open { display: block; }
+
+.cat { margin-bottom: 4px; }
+.cat-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s; user-select: none;
+  font-size: 12px; font-weight: 600; color: var(--text2);
+}
+.cat-header:hover { background: rgba(255,255,255,0.03); }
+.cat-header .arrow { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+.cat-header.open .arrow { transform: rotate(90deg); }
+.cat-header .count { margin-left: auto; font-family: var(--mono); font-size: 9px; color: var(--text3); }
+.cat-body { display: none; padding: 2px 0 2px 16px; }
+.cat-body.open { display: block; }
+
+.sub { margin-bottom: 4px; }
+.sub-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s; user-select: none;
+  font-size: 11px; font-weight: 500; color: var(--text3);
+}
+.sub-header:hover { background: rgba(255,255,255,0.02); }
+.sub-header .arrow { font-size: 8px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+.sub-header.open .arrow { transform: rotate(90deg); }
+.sub-header .count { margin-left: auto; font-family: var(--mono); font-size: 9px; color: var(--text3); }
+.sub-body { display: none; padding: 4px 0; }
+.sub-body.open { display: block; }
+
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 11px; margin: 4px 0 8px;
+}
+thead th {
+  text-align: left; padding: 6px 8px;
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text3); font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  white-space: nowrap; user-select: none;
+}
+tbody td {
+  padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle; line-height: 1.4;
+}
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+.param-name {
+  font-family: var(--mono); font-weight: 500; color: var(--cyan);
+  white-space: nowrap; width: 80px; min-width: 80px; max-width: 80px;
+  white-space: normal; word-wrap: break-word;
+  vertical-align: middle;
+}
+
+.param-value {
+  vertical-align: middle;
+}
+.param-value span {
+  display: block; font-family: var(--mono); font-size: 10px;
+  padding: 1px 0;
+}
+.param-nums {
+  vertical-align: middle; text-align: center;
+}
+.param-nums .imp-badge, .param-nums .loc-badge {
+  display: flex; align-items: center; justify-content: center;
+  margin: 2px auto;
+  width: 20px; height: 20px; font-size: 11px;
+  flex-shrink: 0;
+}
+.param-value .v-min { color: var(--text3); }
+.param-value .v-def { color: var(--text2); font-weight: 600; }
+.param-value .v-max { color: var(--text3); }
+.param-value .v-min::before { content: "Min "; font-family: var(--font); font-size: 8px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.03em; }
+.param-value .v-def::before { content: "Def "; font-family: var(--font); font-size: 8px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.03em; }
+.param-value .v-max::before { content: "Max "; font-family: var(--font); font-size: 8px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* removed */ { font-family: var(--mono); font-size: 10px; color: var(--text2); white-space: nowrap; }
+/* removed */ { font-family: var(--mono); font-size: 10px; color: var(--text3); white-space: nowrap; }
+
+/* Type badges */
+.tbadge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 3px;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  flex-shrink: 0;
+}
+.tbadge-F { background: rgba(34,211,238,0.15); color: #22d3ee; }
+.tbadge-I { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.tbadge-B { background: rgba(45,212,191,0.15); color: #2dd4bf; }
+.tbadge-E { background: rgba(192,132,252,0.15); color: #c084fc; }
+.tbadge-S { background: rgba(255,255,255,0.06); color: var(--text2); }
+
+/* Scope badges inline with type */
+.scope-badge {
+  font-family: var(--mono); font-size: 9px; font-weight: 600;
+  padding: 1px 5px; border-radius: 3px;
+}
+.scope-E { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.scope-R { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+.scope-B { background: rgba(52,211,153,0.15); color: #34d399; }
+.scope-U { background: rgba(107,114,128,0.15); color: #6b7280; }
+
+.desc { font-size: 10px; color: var(--text3); line-height: 1.4; }
+.key-row-title {
+  font-size: 11px; font-weight: 600; color: var(--text);
+  font-family: var(--font); margin-bottom: 8px; margin-top: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.key-badge-count {
+  font-size: 9px; color: var(--text3); font-family: var(--mono);
+  font-weight: 400;
+}
+.key-count-badge {
+  font-family: var(--mono); font-size: 8px; font-weight: 600;
+  color: var(--text3); background: var(--border);
+  padding: 0 5px; border-radius: 4px; margin-left: 4px;
+}
+.hidden { display: none !important; }
+.param-badges {
+  display: grid; grid-template-columns: repeat(4, 20px);
+  gap: 3px; align-items: center;
+  width: 89px;
+}
+.cluster-gap { display: inline-block; width: 4px; }
+.imp-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 3px;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+}
+.imp-3 { background: rgba(248,113,113,0.2); color: var(--red); }
+.imp-2 { background: rgba(251,146,60,0.2); color: #fb923c; }
+.imp-1 { background: rgba(250,204,21,0.2); color: #facc15; }
+.imp-0 { background: rgba(132,204,22,0.2); color: #84cc16; }
+.live-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 4px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 600;
+}
+.live-yes { background: rgba(16,185,129,0.15); color: #10b981; }
+.live-no { background: rgba(248,113,113,0.15); color: var(--red); }
+
+
+/* UI Control badges */
+
+/* Need badges */
+.need-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+}
+.need-S { background: rgba(8,145,178,0.15); color: #0891b2; }
+.need-D { background: rgba(161,98,7,0.15); color: #a16207; }
+.need-B { background: rgba(124,58,237,0.15); color: #7c3aed; }
+.need-F { background: rgba(156,163,175,0.10); color: #9ca3af; }
+/* Doc Gaps badges */
+.doc-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+}
+.doc-3 { background: rgba(248,113,113,0.2); color: var(--red); }
+.doc-2 { background: rgba(251,146,60,0.2); color: #fb923c; }
+.doc-1 { background: rgba(250,204,21,0.2); color: #facc15; }
+.doc-0 { background: rgba(132,204,22,0.2); color: #84cc16; }
+/* Default Confidence badges */
+.dconf-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 14px; height: 14px; padding: 0 2px; border-radius: 3px;
+  font-family: var(--mono); font-size: 7px; font-weight: 700;
+}
+.dconf-H { background: rgba(101,163,13,0.2); color: #65a30d; }
+.dconf-M { background: rgba(146,64,14,0.2); color: #92400e; }
+.dconf-L { background: rgba(239,68,68,0.2); color: #ef4444; }
+.dconf-- { background: rgba(255,255,255,0.03); color: var(--text3); }
+/* Tuning Cadence badges */
+.cadence-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 14px; height: 14px; padding: 0 2px; border-radius: 3px;
+  font-family: var(--mono); font-size: 7px; font-weight: 700;
+}
+.cadence-F { background: rgba(15,118,110,0.15); color: #0f766e; }
+.cadence-O { background: rgba(2,132,199,0.15); color: #0284c7; }
+.cadence-R { background: rgba(217,119,6,0.15); color: #d97706; }
+.cadence-- { background: rgba(255,255,255,0.03); color: var(--text3); }
+
+/* Boundedness badges */
+.bound-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 14px; height: 14px; padding: 0 2px; border-radius: 3px;
+  font-family: var(--mono); font-size: 7px; font-weight: 700;
+}
+.bound-B { background: rgba(79,70,229,0.15); color: #4f46e5; }
+.bound-O { background: rgba(219,39,119,0.15); color: #db2777; }
+.bound-U { background: rgba(194,65,12,0.15); color: #c2410c; }
+.bound-- { background: rgba(255,255,255,0.03); color: var(--text3); }
+/* Group badges */
+.group-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 14px; height: 14px; padding: 0 2px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+}
+.group-G { background: rgba(59,130,246,0.2); color: #3b82f6; }
+.group-S { background: rgba(168,85,247,0.2); color: #a855f7; }
+.group-R { background: rgba(34,197,94,0.2); color: #22c55e; }
+.group-P { background: rgba(251,146,60,0.2); color: #fb923c; }
+/* Role badges */
+.role-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 14px; height: 14px; padding: 0 2px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+}
+.role-P { background: rgba(239,68,68,0.2); color: #ef4444; }
+.role-R { background: rgba(139,92,246,0.2); color: #8b5cf6; }
+.role-W { background: rgba(16,185,129,0.2); color: #10b981; }
+.role-D { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.role-I { background: rgba(236,72,153,0.2); color: #ec4899; }
+.role-C { background: rgba(6,182,212,0.2); color: #06b6d4; }
+.role-F { background: rgba(107,114,128,0.2); color: #6b7280; }
+.role-M { background: rgba(165,180,252,0.2); color: #a5b4fc; }
+.ctrl-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 2px; border-radius: 3px;
+  font-family: var(--mono); font-size: 7px; font-weight: 700;
+}
+.ctrl-S { background: rgba(244,63,94,0.15); color: #f43f5e; }
+.ctrl-T { background: rgba(168,85,247,0.15); color: #a855f7; }
+.ctrl-D { background: rgba(234,179,8,0.15); color: #eab308; }
+.ctrl-B { background: rgba(14,165,233,0.15); color: #0ea5e9; }
+.ctrl-- { background: rgba(255,255,255,0.03); color: var(--text3); }
+
+/* Precision badges */
+.prec-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+}
+.prec-C { background: rgba(5,150,105,0.15); color: #059669; }
+.prec-D { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.prec-- { background: rgba(255,255,255,0.03); color: var(--text3); }
+/* Domain badges */
+.dom-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+}
+.dom-S { background: rgba(37,99,235,0.15); color: #2563eb; }
+.dom-R { background: rgba(8,145,178,0.15); color: #0891b2; }
+.dom-P { background: rgba(236,72,153,0.15); color: #ec4899; }
+.dom-I { background: rgba(6,182,212,0.15); color: #06b6d4; }
+.dom-- { background: rgba(255,255,255,0.03); color: var(--text3); }
+.loc-badge {
+  background: rgba(139,139,160,0.1); color: #8b8ba0;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 3px; border-radius: 3px;
+  font-family: var(--mono); font-size: 8px; font-weight: 600;
+  background: rgba(255,255,255,0.04); color: var(--text3);
+}
+.param-min, .param-def, .param-max {
+  font-family: var(--mono); font-size: 10px; white-space: nowrap;
+}
+.param-min { color: var(--text2); }
+.param-def { color: var(--text); font-weight: 500; }
+.param-max { color: var(--text3); }
+.key-section {
+  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.key-header {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.key-header::-webkit-details-marker { display: none; }
+.key-header .key-count { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-left: auto; }
+.key-body {
+  padding: 8px 16px 16px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.key-super-group {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.key-super-title {
+  font-size: 11px; font-weight: 700; color: var(--text);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.key-group { }
+.key-title {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 6px; padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.key-items { display: flex; flex-direction: column; gap: 4px; }
+.key-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text2);
+}
+.key-item b { color: var(--text); font-weight: 500; font-family: var(--mono); }
+
+.tabs {
+  display: flex; gap: 4px;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  flex: 1;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px;
+  color: var(--text3); font-family: var(--font); font-size: 11px;
+  font-weight: 500; cursor: pointer; transition: all 0.15s;
+  text-align: center;
+}
+.tab-btn:hover { border-color: rgba(255,255,255,0.15); color: var(--text2); }
+.tab-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(108,92,231,0.1); }
+.tab-content { display: none; }
+.sort-indicator { font-size: 8px; margin-left: 2px; opacity: 0.5; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--text); }
+th.sortable.active { color: var(--cyan); }
+.tab-content.active { display: block; }
+
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .super-body { padding-left: 4px; }
+  .cat-body { padding-left: 4px; }
+  .sub-body { padding-left: 2px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .search-wrap { min-width: auto; max-width: 100%; }
+  .search-box { min-width: auto; font-size: 14px; }
+  .filter-group { gap: 4px; }
+  .filter-group-live { margin-left: 0; padding-left: 0; border-left: none; margin-top: 4px; }
+  .filter-btn { font-size: 9px; padding: 5px 8px; }
+  .param-badges { grid-template-columns: repeat(4, 18px); gap: 2px; }
+
+  .key-body { grid-template-columns: 1fr 1fr; }
+  .key-group { min-width: auto; }
+  .tabs { flex-wrap: wrap; }
+  .tab-btn { font-size: 10px; padding: 6px 8px; min-width: 70px; flex: 1 0 auto; }
+  .tab-content { overflow-x: auto; }
+  tbody td, thead th { white-space: nowrap; }
+  .desc { white-space: normal; min-width: 120px; }
+}
+/* Print styles */
+@media print {
+  body { background: #fff; color: #000; padding: 12px; }
+  .key-row-title {
+  font-size: 11px; font-weight: 600; color: var(--text);
+  font-family: var(--font); margin-bottom: 8px; margin-top: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.key-badge-count {
+  font-size: 9px; color: var(--text3); font-family: var(--mono);
+  font-weight: 400;
+}
+.key-count-badge {
+  font-family: var(--mono); font-size: 8px; font-weight: 600;
+  color: var(--text3); background: var(--border);
+  padding: 0 5px; border-radius: 4px; margin-left: 4px;
+}
+.hidden { display: none !important; }
+  .super-body, .cat-body, .sub-body { display: block !important; }
+  .super-header .arrow, .cat-header .arrow, .sub-header .arrow { display: none; }
+  .search-box, .filter-group, .search-clear, .tabs, .filter-group-live { display: none !important; }
+  .key { display: none !important; }
+  .super-header { background: #f5f5f5; border-color: #ddd; }
+  .super-header .label { -webkit-text-fill-color: #333; color: #333; background: none; }
+  .header h1 { -webkit-text-fill-color: #333; color: #333; background: none; }
+  .summary { color: #666; }
+  .summary .num { color: #333; }
+  table { font-size: 8px; }
+  thead th { background: #eee; color: #333; }
+  tbody td { color: #333; }
+  .param-badges { grid-template-columns: repeat(4, 16px); gap: 1px; }
+  .cluster-gap { width: 2px; }
+  .imp-badge, .loc-badge, .live-badge, .ctrl-badge, .need-badge, .doc-badge, .dconf-badge, .cadence-badge, .group-badge, .role-badge, .bound-badge, .prec-badge, .scope-badge { 
+    -webkit-color-adjust: exact; color-adjust: exact; 
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>✦ Parameter Reference</h1>
+    <div class="sub">Synthetic Life — Particle Emergence Simulator</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input class="search-box" id="search" type="text" placeholder="Search parameters...">
+      <button class="search-clear" id="searchClear" title="Clear search">✕</button>
+    </div>
+    <div class="filter-group expanded">
+      <span class="filter-label">Imp</span>
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn imp-3-btn" data-filter="3">3</button>
+      <button class="filter-btn imp-2-btn" data-filter="2">2</button>
+      <button class="filter-btn imp-1-btn" data-filter="1">1</button>
+      <button class="filter-btn imp-0-btn" data-filter="0">0</button>
+      <span class="filter-label">Live</span>
+      <button class="filter-btn" data-filter="live-yes">Yes</button>
+      <button class="filter-btn" data-filter="live-no">No</button>
+    </div>
+    <div class="filter-help-wrap">
+      <button class="filter-help-btn" id="filterHelpBtn" onclick="document.getElementById('filterTooltip').classList.toggle('show')">?</button>
+      <div class="filter-tooltip" id="filterTooltip">
+        <strong>Filter buttons:</strong><br>
+        <b>All</b> — show all parameters<br>
+        <b>3</b> — Critical importance only<br>
+        <b>2</b> — High importance<br>
+        <b>1</b> — Medium importance<br>
+        <b>0</b> — Low importance<br>
+        <b>Yes</b> — Live-updating params<br>
+        <b>No</b> — Requires reset params<br><br>
+        Combine with the search box to narrow further.
+      </div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <details class="key-section" id="keySection">
+    <summary class="key-header">Legend <span class="key-count">▼</span></summary>
+    <div class="key-body">
+      <div class="key-row-title">Row 1 — Identity <span class="key-badge-count">Type · Prec · Doc · Dconf</span></div>
+      <div class="key-row-grid" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
+        <div class="key-group">
+          <div class="key-title">Type <span class="key-count-badge">5</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="tbadge tbadge-F">F</span> Float</span>
+            <span class="key-item"><span class="tbadge tbadge-I">I</span> Integer</span>
+            <span class="key-item"><span class="tbadge tbadge-B">B</span> Boolean</span>
+            <span class="key-item"><span class="tbadge tbadge-E">E</span> Enum</span>
+            <span class="key-item"><span class="tbadge tbadge-S">S</span> String</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Prec <span class="key-count-badge">3</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="prec-badge prec-C">C</span> Continuous</span>
+            <span class="key-item"><span class="prec-badge prec-D">D</span> Discrete</span>
+            <span class="key-item"><span class="prec-badge prec--">—</span> N/A</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Doc <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="doc-badge doc-3">3</span> Stub &lt;20ch</span>
+            <span class="key-item"><span class="doc-badge doc-2">2</span> Minimal</span>
+            <span class="key-item"><span class="doc-badge doc-1">1</span> Partial</span>
+            <span class="key-item"><span class="doc-badge doc-0">0</span> Complete</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Dconf <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="dconf-badge dconf-H">H</span> Tuned</span>
+            <span class="key-item"><span class="dconf-badge dconf-M">M</span> Global</span>
+            <span class="key-item"><span class="dconf-badge dconf-L">L</span> Auto</span>
+            <span class="key-item"><span class="dconf-badge dconf--">—</span> Varies</span>
+          </div>
+        </div>
+      </div>
+      <div class="key-row-title">Row 2 — Relations <span class="key-badge-count">Scope · Need · Bound · Ctrl</span></div>
+      <div class="key-row-grid" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
+        <div class="key-group">
+          <div class="key-title">Scope <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="scope-badge scope-E">E</span> Engine</span>
+            <span class="key-item"><span class="scope-badge scope-R">R</span> Renderer</span>
+            <span class="key-item"><span class="scope-badge scope-B">B</span> Both</span>
+            <span class="key-item"><span class="scope-badge scope-U">U</span> UI</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Need <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="need-badge need-S">S</span> Supplies</span>
+            <span class="key-item"><span class="need-badge need-D">D</span> Depends</span>
+            <span class="key-item"><span class="need-badge need-B">B</span> Both</span>
+            <span class="key-item"><span class="need-badge need-F">F</span> Free</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Bound <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="bound-badge bound-B">B</span> Both</span>
+            <span class="key-item"><span class="bound-badge bound-O">O</span> One-sided</span>
+            <span class="key-item"><span class="bound-badge bound-U">U</span> Unbounded</span>
+            <span class="key-item"><span class="bound-badge bound--">—</span> N/A</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Ctrl <span class="key-count-badge">5</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="ctrl-badge ctrl-S">Sl</span> Slider</span>
+            <span class="key-item"><span class="ctrl-badge ctrl-T">Tg</span> Toggle</span>
+            <span class="key-item"><span class="ctrl-badge ctrl-D">Se</span> Select</span>
+            <span class="key-item"><span class="ctrl-badge ctrl-B">Bt</span> Button</span>
+            <span class="key-item"><span class="ctrl-badge ctrl--">--</span> Readonly</span>
+          </div>
+        </div>
+      </div>
+      <div class="key-row-title">Row 3 — Behaviour <span class="key-badge-count">Cadence · Group · Role · Live</span></div>
+      <div class="key-row-grid" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
+        <div class="key-group">
+          <div class="key-title">Cadence <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="cadence-badge cadence-F">F</span> Frequent</span>
+            <span class="key-item"><span class="cadence-badge cadence-O">O</span> Occasional</span>
+            <span class="key-item"><span class="cadence-badge cadence-R">R</span> Rare</span>
+            <span class="key-item"><span class="cadence-badge cadence--">—</span> Readonly</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Group <span class="key-count-badge">4</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="group-badge group-G">G</span> Global</span>
+            <span class="key-item"><span class="group-badge group-S">S</span> Species</span>
+            <span class="key-item"><span class="group-badge group-R">R</span> Runtime</span>
+            <span class="key-item"><span class="group-badge group-P">P</span> Presets</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Role <span class="key-count-badge">8</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="role-badge role-P">P</span> Physics</span>
+            <span class="key-item"><span class="role-badge role-R">R</span> Rendering</span>
+            <span class="key-item"><span class="role-badge role-W">W</span> World</span>
+            <span class="key-item"><span class="role-badge role-D">D</span> Distrib.</span>
+            <span class="key-item"><span class="role-badge role-I">I</span> Input</span>
+            <span class="key-item"><span class="role-badge role-C">C</span> Camera</span>
+            <span class="key-item"><span class="role-badge role-F">F</span> Perf.</span>
+          </div>
+        </div>
+        <div class="key-group">
+          <div class="key-title">Live <span class="key-count-badge">2</span></div>
+          <div class="key-items">
+            <span class="key-item"><span class="live-badge live-yes">Y</span> Real-time</span>
+            <span class="key-item"><span class="live-badge live-no">N</span> Needs reset</span>
+          </div>
+        </div>
+      </div>
+      <div class="key-super-group">
+        <div class="key-super-title">Counts Column (Imp · LoC)</div>
+        <div class="key-row-grid" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
+          <div class="key-group">
+            <div class="key-title">Importance <span class="key-count-badge">4</span></div>
+            <div class="key-items">
+              <span class="key-item"><span class="imp-badge imp-3">3</span> Critical</span>
+              <span class="key-item"><span class="imp-badge imp-2">2</span> High</span>
+              <span class="key-item"><span class="imp-badge imp-1">1</span> Medium</span>
+              <span class="key-item"><span class="imp-badge imp-0">0</span> Low</span>
+            </div>
+          </div>
+          <div class="key-group">
+            <div class="key-title">LoC</div>
+            <div class="key-items">
+              <span class="key-item"><span class="loc-badge">n</span> Lines of code</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="key-super-group">
+        <div class="key-super-title">Value Column (Min · Def · Max)</div>
+        <div class="key-row-grid" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:4px;">
+          <div class="key-group">
+            <div class="key-title">Value <span class="key-count-badge">3</span></div>
+            <div class="key-items">
+              <span class="key-item"><b>Min</b> Lower bound</span>
+              <span class="key-item"><b>Def</b> Default value</span>
+              <span class="key-item"><b>Max</b> Upper bound</span>
+              <span class="key-item"><b>=</b> Auto-calculated</span>
+              <span class="key-item"><b>~</b> Varies by preset</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div id="tab-full" class="tab-content active"></div>
+</div>
+
+<script>
+
+const DATA = [
+  {
+    super:"Global Config",
+    cat:"Physics",
+    sub:"Dynamics",
+    params:[
+      {name:"friction",type:"F",min:"0.1",avg:"0.82",max:"0.99",imp:3,loc:14,scope:"E",live:"Yes",desc:"Velocity damping applied each frame as a multiplier (0.1–0.99). Lower values = more drag/slower; higher = less drag/more persistent motion. Default 0.82 preserves energy well for organic movement."},
+      {name:"timeScale",type:"F",min:"0.05",avg:"1.0",max:"3",imp:3,loc:15,scope:"E",live:"Yes",desc:"Global speed multiplier for all physics calculations. 1.0 = real-time; 2.0 = 2× speed; 0.5 = half-speed. Affects force application, velocity integration, and noise. Does not affect rendering frame rate."},
+      {name:"maxForce",type:"F",min:"0.1",avg:"3.0",max:"5",imp:2,loc:14,scope:"E",live:"Yes",desc:"Clamps the maximum net force applied to any particle per frame. Higher values allow sharper turns and faster reactions. Lower values produce smoother, more fluid motion at the cost of responsiveness."},
+      {name:"noiseAmount",type:"F",min:"0",avg:"0.04",max:"2",imp:2,loc:14,scope:"E",live:"Yes",desc:"Random perturbation added to each particle's velocity per frame. Adds stochastic jitter resembling Brownian motion. 0 = deterministic; 0.04 = subtle organic wobble; >0.5 = chaotic turbulence."},
+      {name:"minSpeed",type:"F",min:"0",avg:"0",max:"5",imp:1,loc:5,scope:"E",live:"Yes",desc:"Minimum velocity floor for all particles. If a particle's speed drops below this, it's boosted back up. 0 = no floor; >0 prevents particles from ever fully stopping, keeping the system perpetually active."},
+      {name:"dragLinear",type:"F",min:"0",avg:"0",max:"0.5",imp:1,loc:4,scope:"E",live:"Yes",desc:"Linear velocity-proportional drag term. Unlike friction (multiplicative), this subtracts a fraction of velocity each frame. Higher values produce smoother, more damped motion. 0 = no linear drag."},
+      {name:"physicsRate",type:"I",min:"1",avg:"1",max:"5",imp:0,loc:5,scope:"E",live:"Yes",desc:"Ratio of physics ticks to render frames. 1:1 = physics every frame (most accurate). 1:3 = physics every 3rd frame, saving CPU on lower-end devices at the cost of simulation precision."},
+      {name:"angularVelocity",type:"F",min:"0",avg:"0",max:"5",imp:1,loc:4,scope:"E",live:"Yes",desc:"Rotational speed applied per frame. 0 = none; 0.5 = gentle rotation; >2 = rapid spinning."},
+      {name:"momentumDecay",type:"F",min:"0",avg:"0.05",max:"1",imp:1,loc:3,scope:"E",live:"Yes",desc:"How much velocity momentum persists between frames. 0 = no momentum; 1 = full conservation."},
+      {name:"accelerationCurve",type:"F",min:"0.5",avg:"1",max:"3",imp:0,loc:2,scope:"E",live:"Yes",desc:"Force-to-acceleration exponent. 1 = linear; <1 = faster initial; >1 = sluggish then snappy."},
+      {name:"terminalVelocity",type:"F",min:"10",avg:"300",max:"2000",imp:2,loc:4,scope:"E",live:"Yes",desc:"Hard global speed cap overriding species maxSpeed. 300 = moderate; 1000 = extreme."},
+      {name:"inertiaBlend",type:"F",min:"0",avg:"0",max:"0.95",imp:1,loc:3,scope:"E",live:"Yes",desc:"Blends previous velocity with current. 0 = instant; 0.5 = equal blend; >0.8 = heavy smoothing."},
+      {name:"turbulenceScale",type:"F",min:"0.001",avg:"0.05",max:"1",imp:0,loc:3,scope:"E",live:"Yes",desc:"Spatial wavelength of velocity noise. Small = fine jitter; large = broad turbulence."},
+      {name:"velocityQuantize",type:"F",min:"0",avg:"0",max:"5",imp:0,loc:2,scope:"E",live:"Yes",desc:"Snaps velocity to discrete steps. 0 = off; 0.5 = grid-like motion; >1 = coarse steps."},
+      {name:"slipFactor",type:"F",min:"0.1",avg:"1",max:"10",imp:0,loc:3,scope:"E",live:"Yes",desc:"X/Y anisotropy multiplier. 1 = isotropic; >1 = faster in X; <1 = faster in Y."},
+      {name:"kineticThreshold",type:"F",min:"0",avg:"0",max:"10",imp:0,loc:3,scope:"E",live:"Yes",desc:"Min kinetic energy before forces apply. 0 = none; >1 = inertia before response."},
+      {name:"rotationDrag",type:"F",min:"0",avg:"0",max:"0.99",imp:0,loc:2,scope:"E",live:"Yes",desc:"Damping for rotational velocity. 0 = none; 0.9 = quick stop."},
+      {name:"dragQuadratic",type:"F",min:"0",avg:"0",max:"0.5",imp:0,loc:3,scope:"E",live:"Yes",desc:"Velocity-squared fluid drag. Affects faster particles more. 0 = none; >0.1 = resistance."},
+      {name:"jounceLimit",type:"F",min:"0",avg:"0",max:"10",imp:0,loc:2,scope:"E",live:"Yes",desc:"Max change in jerk per frame. Smooths direction changes. 0 = no limit."},
+      {name:"brownianMotion",type:"F",min:"0",avg:"0",max:"2",imp:0,loc:2,scope:"E",live:"Yes",desc:"Thermal random displacement each frame. 0 = off; 0.1 = molecular jitter; >0.5 = shaking."},
+      {name:"boostZoneEnabled",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:6,scope:"E",live:"Yes",desc:"Enable velocity boost zones. Particles crossing regions get speed multipliers."},
+    ]
+  },
+
+  {
+    super:"Global Config",
+    cat:"Physics",
+    sub:"Forces",
+    params:[
+      {name:"gravityWell",type:"F",min:"0",avg:"0",max:"5",imp:2,loc:7,scope:"E",live:"Yes",desc:"Strength of a central gravitational pull toward the world center. 0 = none; >1 = noticeable inward drift; >3 = strong collapse. Creates orbiting or centering behaviors across all species."},
+      {name:"gravityWellRadius",type:"F",min:"100",avg:"2500",max:"10000",imp:1,loc:4,scope:"E",live:"Yes",desc:"Radius within which the gravity well is active. Particles outside this range feel no central pull. Larger radii create broader, gentler attraction; smaller radii produce tight orbital zones."},
+      {name:"vortexStrength",type:"F",min:"0",avg:"0",max:"3",imp:2,loc:8,scope:"E",live:"Yes",desc:"Rotational flow-field strength applied perpendicular to particle velocity. Adds a curl component that produces swirling, vortex-like motion. 0 = no rotation; >1 = visible spiraling; >2 = dominant cyclonic behavior."},
+      {name:"forceDecayPower",type:"F",min:"0.5",avg:"2",max:"4",imp:2,loc:5,scope:"E",live:"Yes",desc:"Exponent controlling how interaction force decays with distance. 1 = linear decay (long-range); 2 = quadratic (default, natural falloff); >3 = sharp cutoff (short-range only). Higher values make interactions more local."},
+      {name:"interactionJitter",type:"F",min:"0",avg:"0",max:"1",imp:1,loc:5,scope:"E",live:"Yes",desc:"Random noise added specifically to inter-particle interaction forces (not velocity). Creates unpredictable, organic wavering in attraction/repulsion. 0 = deterministic; >0.3 = visibly erratic interactions."},
+      {name:"harmonicStrength",type:"F",min:"0",avg:"0",max:"2",imp:2,loc:8,scope:"E",live:"Yes",desc:"Spring-like restorative force pulling particles toward their spawn position. Creates orbiting or tethered behavior. 0 = no pull; >0.5 = noticeable return force; >1 = strong elastic tethering."},
+      {name:"harmonicRange",type:"F",min:"100",avg:"1000",max:"5000",imp:1,loc:4,scope:"E",live:"Yes",desc:"Maximum distance for the harmonic spring force. Particles farther than this from their spawn point feel no restorative pull. Larger ranges create broader, gentler tethers."},
+      {name:"repulsionFalloff",type:"F",min:"0.5",avg:"1",max:"4",imp:1,loc:3,scope:"E",live:"Yes",desc:"Exponent controlling how repulsion force decays from center to edge of the repulsion zone. 1 = linear decay; 2 = quadratic (sharper); higher values make repulsion more concentrated near the particle center."},
+      {name:"wanderRate",type:"F",min:"0",avg:"0",max:"0.5",imp:1,loc:6,scope:"E",live:"Yes",desc:"Rate of random angular velocity perturbation applied each frame. Causes particles to wander in a random-walk pattern. 0 = deterministic; 0.1 = gentle meandering; >0.3 = erratic zigzagging."},
+      {name:"noiseFieldScale",type:"F",min:"0.001",avg:"0.01",max:"0.1",imp:1,loc:4,scope:"E",live:"Yes",desc:"Spatial correlation scale for the position-based noise field. Smaller values = smoother, larger-scale flow patterns; larger values = more chaotic, small-scale turbulence. Only active when noiseFieldStrength > 0."},
+      {name:"noiseFieldStrength",type:"F",min:"0",avg:"0",max:"3",imp:2,loc:5,scope:"E",live:"Yes",desc:"Magnitude of position-correlated noise force. Unlike random noise, this creates coherent flow patterns based on a particle's position in space. 0 = off; >1 = visible currents and eddies."},
+      {name:"velocityClip",type:"B",min:"—",avg:"false",max:"—",imp:1,loc:4,scope:"E",live:"Yes",desc:"When enabled, clamps force per-axis instead of vector magnitude. Prevents diagonal dominance in force application. Off = standard vector clamping (smooth); On = per-axis cap (boxy but predictable)."},
+      {name:"windDir",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:3,scope:"E",live:"Yes",desc:"Wind direction in degrees. 0=right; 90=down; 180=left; 270=up."},
+      {name:"windStrength",type:"F",min:"0",avg:"0",max:"10",imp:0,loc:2,scope:"E",live:"Yes",desc:"Constant wind magnitude. 0=none; 0.5=breeze; >3=gale."},
+      {name:"radialPulseAmp",type:"F",min:"0",avg:"0",max:"5",imp:1,loc:4,scope:"E",live:"Yes",desc:"Periodic radial pulse amplitude from center. 0=off; 1=moderate; >2=strong breathing."},
+      {name:"radialPulseFreq",type:"F",min:"0.1",avg:"0.5",max:"10",imp:0,loc:2,scope:"E",live:"Yes",desc:"Radial pulse frequency in Hz. 0.5=slow; 2=fast; >5=vibration."},
+      {name:"tidalStrength",type:"F",min:"0",avg:"0",max:"3",imp:0,loc:3,scope:"E",live:"Yes",desc:"X/Y stretching tidal force. Positive=stretch X; Negative=stretch Y."},
+      {name:"noiseOctaves",type:"I",min:"1",avg:"2",max:"6",imp:0,loc:3,scope:"E",live:"Yes",desc:"Fractal noise layers for force fields. 1=simple; 3=detailed; >4=chaotic."},
+      {name:"waveForceAmp",type:"F",min:"0",avg:"0",max:"5",imp:0,loc:4,scope:"E",live:"Yes",desc:"Traveling wave force amplitude. 0=off; 1=gentle; >2=strong."},
+      {name:"waveFreq",type:"F",min:"0.1",avg:"1",max:"10",imp:0,loc:2,scope:"E",live:"Yes",desc:"Wave oscillation frequency. Higher=tighter wave spacing."},
+      {name:"waveDir",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:2,scope:"E",live:"Yes",desc:"Wave travel direction in degrees."},
+      {name:"centrifugalStrength",type:"F",min:"0",avg:"0",max:"3",imp:0,loc:3,scope:"E",live:"Yes",desc:"Outward force proportional to distance from center. 0=off; >0=flung outward."},
+      {name:"coriolisStrength",type:"F",min:"0",avg:"0",max:"3",imp:0,loc:4,scope:"E",live:"Yes",desc:"Perpendicular deflection proportional to velocity. 0=off; >0=curving paths."},
+      {name:"forceFieldType",type:"E",min:"—",avg:"radial",max:"—",imp:1,loc:5,scope:"E",live:"Yes",desc:"Global force field: radial, vortex, wave, turbulent."},
+      {name:"toroidalFlow",type:"F",min:"0",avg:"0",max:"3",imp:0,loc:3,scope:"E",live:"Yes",desc:"Ring-shaped rotational flow. 0=off; >0=toroidal orbits."},
+      {name:"springStiffness",type:"F",min:"0",avg:"0",max:"3",imp:1,loc:4,scope:"E",live:"Yes",desc:"Restorative force to spawn origin. 0=off; 0.5=gentle tether; >1=strong return."},
+      {name:"antigravityWell",type:"F",min:"0",avg:"0",max:"5",imp:1,loc:3,scope:"E",live:"Yes",desc:"Repulsive central force opposite gravityWell. 0=off; >0=outward push."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Physics",
+    sub:"Boundary & Material",
+    params:[
+      {name:"bounceRestitution",type:"F",min:"0.1",avg:"0.5",max:"1",imp:1,loc:3,scope:"E",live:"Yes",desc:"Energy retention coefficient for bounce edge mode. 0.5 = retain half velocity on bounce; 1.0 = perfectly elastic (full energy); <0.3 = dampened, sticky walls. Only active when edgeMode = bounce."},
+      {name:"bounceFriction",type:"F",min:"0",avg:"0.3",max:"1",imp:1,loc:5,scope:"E",live:"Yes",desc:"Tangential friction on wall bounce. Reduces velocity parallel to the wall surface on impact. 0 = no tangential loss; 0.3 = moderate friction; 1 = full stop of tangential motion. Only applies in bounce edge mode."},
+      {name:"bounceRandomize",type:"F",min:"0",avg:"0",max:"30",imp:1,loc:6,scope:"E",live:"Yes",desc:"Random angular deflection (in degrees) applied to the velocity direction on wall bounce. Adds unpredictability to reflections. 0 = perfect reflection; 10 = moderate scatter; 30 = chaotic dispersion."},
+      {name:"boundaryRepelForce",type:"F",min:"0",avg:"0",max:"5",imp:1,loc:6,scope:"E",live:"Yes",desc:"Soft repulsion force applied when particles approach world edges. Creates a gradual push away from boundaries rather than hard clipping or bouncing. Works alongside all edge modes. 0 = no repulsion."},
+      {name:"worldMargin",type:"F",min:"10",avg:"50",max:"500",imp:0,loc:3,scope:"E",live:"Yes",desc:"Width of the soft boundary repulsion margin in world units. Larger margins create earlier, gentler pushback from edges. Only active when boundaryRepelForce > 0."},
+      {name:"massVariation",type:"F",min:"0",avg:"0",max:"1",imp:2,loc:8,scope:"E",live:"Yes",desc:"Random mass variation within each species (0–1). 0 = all particles have equal mass; 0.5 = 50% variation; 1 = full order-of-magnitude spread. Higher mass = lower acceleration from forces, creating inertial diversity."},
+      {name:"spawnJitter",type:"F",min:"0",avg:"0.2",max:"0.5",imp:0,loc:4,scope:"E",live:"No",desc:"Random position jitter fraction applied to grid spawn positions. 0 = perfect grid alignment; 0.2 = slight scatter (default); 0.5 = near-random. Only affects distributionMode = grid. Requires re-spawn to take effect."},
+      {name:"boundaryKillChance",type:"F",min:"0",avg:"0",max:"1",imp:1,loc:3,scope:"E",live:"Yes",desc:"Probability of particle removal on boundary hit. 0=never; 0.1=10%; 1=always."},
+      {name:"boundarySpawnEnabled",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:4,scope:"E",live:"Yes",desc:"Spawn new particles on boundary contact."},
+      {name:"boundarySpawnCount",type:"I",min:"1",avg:"2",max:"10",imp:0,loc:2,scope:"E",live:"No",desc:"Particles to spawn per boundary contact."},
+      {name:"boundarySpawnSpecies",type:"I",min:"0",avg:"0",max:"4",imp:0,loc:2,scope:"E",live:"Yes",desc:"Species index for boundary spawning."},
+      {name:"edgeFalloff",type:"F",min:"0",avg:"0.3",max:"1",imp:0,loc:3,scope:"E",live:"Yes",desc:"Gradualness of boundary repulsion onset."},
+      {name:"collisionElasticity",type:"F",min:"0",avg:"0.3",max:"1",imp:1,loc:4,scope:"E",live:"Yes",desc:"Energy retention on particle collision. 0=stick; 0.3=moderate; 1=elastic."},
+      {name:"selfCollision",type:"B",min:"—",avg:"true",max:"—",imp:1,loc:3,scope:"E",live:"Yes",desc:"Same-species collisions enabled."},
+      {name:"massTransfer",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:3,scope:"E",live:"Yes",desc:"Velocity/mass exchange fraction on collision."},
+      {name:"mergingEnabled",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:3,scope:"E",live:"Yes",desc:"Particles merge on collision."},
+      {name:"mergeSizeThreshold",type:"F",min:"1",avg:"5",max:"20",imp:0,loc:2,scope:"E",live:"Yes",desc:"Max particle size before merge refused."},
+      {name:"fragmentationThreshold",type:"F",min:"0",avg:"0",max:"20",imp:0,loc:3,scope:"E",live:"Yes",desc:"Speed threshold for fragmentation on collision."},
+      {name:"fragmentCount",type:"I",min:"2",avg:"3",max:"8",imp:0,loc:2,scope:"E",live:"Yes",desc:"Fragments created per fragmentation event."},
+      {name:"pressureEnabled",type:"B",min:"—",avg:"false",max:"—",imp:1,loc:4,scope:"E",live:"Yes",desc:"Pressure force between crowded particles."},
+      {name:"pressureStiffness",type:"F",min:"0.1",avg:"1",max:"10",imp:0,loc:2,scope:"E",live:"Yes",desc:"Pressure force strength between crowded particles."},
+      {name:"surfaceAdhesion",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Wall stickiness. 0=bounce; 0.5=sticky; 1=permanent."},
+      {name:"wallElasticityLeft",type:"F",min:"0",avg:"1",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Left boundary elasticity independent per wall."},
+      {name:"wallElasticityRight",type:"F",min:"0",avg:"1",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Right boundary elasticity."},
+      {name:"wallElasticityTop",type:"F",min:"0",avg:"1",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Top boundary elasticity."},
+      {name:"wallElasticityBottom",type:"F",min:"0",avg:"1",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Bottom boundary elasticity."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Physics",
+    sub:"Advanced",
+    params:[
+      {name:"velocityDampingZ",type:"F",min:"0.1",avg:"0.82",max:"0.99",imp:1,loc:4,scope:"E",live:"Yes",desc:"Separate velocity damping factor for Z-axis motion. Independent from XY friction, allowing depth-axis momentum to decay at a different rate. Higher = more Z persistence; lower = quick Z settling."},
+      {name:"pairwiseCutoff",type:"I",min:"10",avg:"200",max:"1000",imp:1,loc:6,scope:"E",live:"Yes",desc:"Maximum number of inter-particle interactions processed per particle per frame. Acts as a performance governor on dense simulations. Lower values reduce accuracy but improve FPS. Only reached in high-density scenarios."},
+      {name:"matrixDrift",type:"F",min:"0",avg:"0",max:"0.1",imp:2,loc:9,scope:"E",live:"Yes",desc:"Rate at which interaction matrix values drift toward zero each physics tick. Creates evolving, unstable relationships between species. 0 = fixed matrix; >0 = relationships decay over time, forcing constant adaptation."},
+      {name:"forceInertia",type:"F",min:"0",avg:"0",max:"0.95",imp:1,loc:5,scope:"E",live:"Yes",desc:"Force inertia — blends previous frame's force with current. 0 = instantaneous response; 0.5 = moderate smoothing; >0.8 = slow, sluggish force changes. Creates more fluid, less jittery motion patterns."},
+      {name:"interactionSymmetry",type:"F",min:"0",avg:"0",max:"1",imp:1,loc:4,scope:"E",live:"Yes",desc:"Force matrix symmetry enforcement. 0 = fully asymmetric (each directed pair independent); 1 = fully symmetric (i→j force equals j→i). Intermediate values blend both. Creates more balanced, conservative interactions."},
+      {name:"pairwiseSkipChance",type:"F",min:"0",avg:"0",max:"0.9",imp:0,loc:3,scope:"E",live:"Yes",desc:"Probability of randomly skipping each pairwise interaction check. A performance-tuning parameter for dense simulations. 0 = check all pairs; 0.5 = skip half; >0.7 = sparse, noisy interactions."},
+      {name:"centerBias",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:4,scope:"E",live:"No",desc:"Spawn position bias toward world center. 0 = uniform random; 0.5 = moderate central clustering; 1 = all particles spawn within a central circle. Reduces initial boundary collisions. Requires re-spawn to take effect."},
+      {name:"boundaryWarmth",type:"F",min:"0",avg:"0",max:"2",imp:1,loc:5,scope:"E",live:"Yes",desc:"Velocity boost applied when particles are near world edges. Counteracts boundary aversion and keeps populations active near walls. 0 = no effect; >1 = energetic edge behavior."},
+      {name:"radialDrift",type:"F",min:"-1",avg:"0",max:"1",imp:1,loc:5,scope:"E",live:"Yes",desc:"Constant radial velocity toward or away from world center. Negative = inward drift (collapse); Positive = outward drift (expansion). Creates breathing, pulsating global motion patterns."},
+      {name:"noiseDrift",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:3,scope:"E",live:"Yes",desc:"Directional persistence in random noise. Higher values create longer, more coherent noise vectors rather than isotropic jitter. Adds a drifting quality to otherwise random perturbations."},
+      {name:"jerkLimit",type:"F",min:"0",avg:"0",max:"10",imp:1,loc:4,scope:"E",live:"Yes",desc:"Maximum allowed change in force per frame (jerk). Prevents sudden force spikes from causing unnatural velocity jumps. 0 = no limit; higher values allow more abrupt directional changes."},
+      {name:"zGravity",type:"F",min:"-0.1",avg:"0",max:"0.1",imp:0,loc:3,scope:"E",live:"Yes",desc:"Constant gravitational acceleration on the Z axis. Positive = particles drift upward in Z; Negative = downward settling. Very subtle — best combined with a non-zero Z range for visible depth stratification."},
+      {name:"velocityExchange",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:4,scope:"E",live:"Yes",desc:"Velocity exchange during close particle encounters. Higher values cause more momentum transfer between colliding particles. Creates more elastic, billiard-ball-like collision dynamics between species."},
+      {name:"velocityDecayAngle",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:3,scope:"E",live:"Yes",desc:"Angular direction bias for velocity damping. Damps velocity components non-uniformly based on their angle. 0 = standard isotropic damping; 90 = damp preferentially along X; 180 = damp preferentially along Y. Creates directional grain in motion."},
+      {name:"subSteps",type:"I",min:"1",avg:"1",max:"8",imp:2,loc:4,scope:"E",live:"Yes",desc:"Physics sub-steps per frame. 1=default; >1=more accurate but slower."},
+      {name:"deterministicSeed",type:"I",min:"0",avg:"42",max:"9999",imp:0,loc:3,scope:"E",live:"No",desc:"RNG seed for reproducible sims. 0=random; non-zero=fixed."},
+      {name:"chaosMultiplier",type:"F",min:"0",avg:"0",max:"3",imp:0,loc:3,scope:"E",live:"Yes",desc:"Amplifies small variations into chaos. 0=deterministic; >0.5=butterfly effect."},
+      {name:"adaptiveTimestep",type:"B",min:"—",avg:"true",max:"—",imp:1,loc:5,scope:"E",live:"Yes",desc:"Auto-adjust timestep based on activity."},
+      {name:"energyConservation",type:"F",min:"0",avg:"0",max:"1",imp:1,loc:4,scope:"E",live:"Yes",desc:"Energy conservation enforcement. 0=standard; 1=strict conservation."},
+      {name:"sleepThreshold",type:"F",min:"0",avg:"0",max:"0.5",imp:0,loc:4,scope:"E",live:"Yes",desc:"Velocity below which particles sleep. Improves perf. 0=no sleep."},
+      {name:"wakeThreshold",type:"F",min:"0.01",avg:"0.1",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Velocity needed to wake sleeping particles."},
+      {name:"lodDistance",type:"F",min:"100",avg:"2000",max:"10000",imp:0,loc:4,scope:"E",live:"Yes",desc:"Distance beyond which physics LOD simplifies."},
+      {name:"perturbationFreq",type:"F",min:"0",avg:"0",max:"10",imp:0,loc:2,scope:"E",live:"Yes",desc:"Random perturbation injections per second."},
+      {name:"memoryDecay",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:3,scope:"E",live:"Yes",desc:"Rate at which harmonic reference positions decay."},
+      {name:"forceAccumMode",type:"E",min:"—",avg:"sum",max:"—",imp:1,loc:3,scope:"E",live:"Yes",desc:"Force combination mode: sum, max, average, weighted."},
+      {name:"solverIterations",type:"I",min:"1",avg:"1",max:"10",imp:1,loc:3,scope:"E",live:"Yes",desc:"Constraint solver passes per step."},
+      {name:"velocitySolver",type:"E",min:"—",avg:"euler",max:"—",imp:1,loc:6,scope:"E",live:"No",desc:"Integration method: euler, verlet, semi-implicit."},
+      {name:"contactOffset",type:"F",min:"1",avg:"5",max:"50",imp:0,loc:2,scope:"E",live:"Yes",desc:"Extra distance for collision detection buffer."},
+      {name:"restOffset",type:"F",min:"1",avg:"3",max:"20",imp:0,loc:2,scope:"E",live:"Yes",desc:"Resting distance for colliding particles."},
+      {name:"matrixNoise",type:"F",min:"0",avg:"0",max:"0.5",imp:0,loc:3,scope:"E",live:"Yes",desc:"Random fluctuation in matrix values per frame."},
+      {name:"matrixDecayMode",type:"E",min:"—",avg:"linear",max:"—",imp:0,loc:3,scope:"E",live:"Yes",desc:"Matrix decay mode: linear, exponential, sudden."},
+      {name:"timeReversal",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:3,scope:"E",live:"Yes",desc:"Reverse simulation direction."},
+      {name:"radialBins",type:"I",min:"1",avg:"8",max:"64",imp:0,loc:3,scope:"E",live:"Yes",desc:"Angular sectors for directional queries."},
+      {name:"speciesAffinity",type:"F",min:"-1",avg:"0",max:"1",imp:0,loc:2,scope:"E",live:"Yes",desc:"Global multiplier for all inter-species forces."},,
+]
+  },
+  {
+    super:"Global Config",
+    cat:"Rendering",
+    sub:"Trails",
+    params:[
+      {name:"trailsEnabled",type:"B",min:"—",avg:"true",max:"—",imp:1,loc:6,scope:"R",live:"Yes",desc:"When on, each frame is composited over the previous with partial opacity instead of cleared, creating motion trails. Increases GPU fill-rate cost; pairs with trailOpacity to control fade speed."},
+      {name:"trailOpacity",type:"F",min:"0",avg:"0.03",max:"0.2",imp:1,loc:16,scope:"R",live:"Yes",desc:"How much the current frame fades the previous frame's content (0–0.2). Higher = longer/hollower trails. 0.03 = subtle ghosting; >0.1 = heavy smearing. Only active when trailsEnabled is on."},
+      {name:"trailLength",type:"I",min:"1",avg:"60",max:"300",imp:1,loc:4,scope:"R",live:"Yes",desc:"Number of frames a trail persists before fully fading. 1 = no trail; 30 = ~1s trail at 30fps; 60 = ~2s; >100 = long smearing. Works alongside trailOpacity for fine control."},
+      {name:"trailDecayCurve",type:"E",min:"—",avg:"exponential",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"Shape of the trail opacity fade over time. linear = even fade; exponential = fast then slow; sigmoid = slow-fast-slow. Affects the visual character of motion trails."},
+      {name:"trailColorBlend",type:"E",min:"—",avg:"mix",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"How trail color blends with the background. mix = standard alpha blend; additive = bright trails; multiply = dark trails. Creates different trail aesthetics."},
+      {name:"trailPerSpecies",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"When on, each species gets its own independent trail layer. Prevents color bleeding between species in trails. Off = all species share one trail buffer."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Rendering",
+    sub:"Glow",
+    params:[
+      {name:"showGlow",type:"B",min:"—",avg:"true",max:"—",imp:1,loc:5,scope:"R",live:"Yes",desc:"Toggles the full-screen bloom glow effect on particles. Adds atmospheric brightness around bright clusters. GPU-intensive on high particle counts; set to off for maximum performance."},
+      {name:"glowIntensity",type:"F",min:"0",avg:"1.0",max:"2",imp:1,loc:7,scope:"R",live:"Yes",desc:"Brightness multiplier for the bloom glow effect (0–2). 0 = off; 1.0 = default intensity; >1.5 = overdriven neon. Scales with particle brightness and saturation."},
+      {name:"glowColor",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:3,scope:"R",live:"Yes",desc:"Hue shift for glow color relative to particle color. 0 = same hue; 180 = complementary; >0 = hue rotation. Creates glow that differs in color from the particle core."},
+      {name:"glowShape",type:"E",min:"—",avg:"radial",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"Glow bloom shape. radial = circular; streak = elongated in movement direction; cross = four-point star; ring = hollow glow ring around particles."},
+      {name:"glowThreshold",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:3,scope:"R",live:"Yes",desc:"Minimum particle brightness required to emit glow. 0 = all particles glow; 0.5 = only brighter particles; >0.8 = only the brightest. Creates selective glow effects."},
+      {name:"glowPulsation",type:"F",min:"0",avg:"0",max:"2",imp:0,loc:3,scope:"R",live:"Yes",desc:"Glow intensity oscillation rate. 0 = steady glow; 0.5 = gentle breathing; >1 = rapid flickering. Adds organic vibrancy to particle illumination."},
+      {name:"glowPerSpecies",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:2,scope:"R",live:"Yes",desc:"When on, each species renders its own independent glow pass. Off = all species share one glow pass (faster). On = richer, separated glow by species (slower)."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Rendering",
+    sub:"Connections",
+    params:[
+      {name:"connectionsEnabled",type:"B",min:"—",avg:"false",max:"—",imp:1,loc:5,scope:"R",live:"Yes",desc:"When on, draws semi-transparent lines between nearby particles of different species. Creates web/network visual patterns. Line count is capped and quality-scaled for performance."},
+      {name:"connectionDistance",type:"F",min:"50",avg:"600",max:"2500",imp:1,loc:7,scope:"R",live:"Yes",desc:"Maximum world-unit distance for inter-particle connection lines. 600 = moderate web; >1500 = dense mesh (expensive). Shorter distances produce cleaner, more selective networks."},
+      {name:"connectionStyle",type:"E",min:"—",avg:"solid",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"Visual style of connection lines. solid = continuous line; dashed = intermittent dashes; glow = blurry luminous lines; beam = tapered beam between particles."},
+      {name:"connectionColorMode",type:"E",min:"—",avg:"blend",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"How connection line color is determined. blend = mix of both species hues; source = first species color; target = second species; rainbow = cycling hue by distance."},
+      {name:"connectionAnimSpeed",type:"F",min:"0",avg:"0",max:"5",imp:0,loc:3,scope:"R",live:"Yes",desc:"Animation speed for connection flow effect. 0 = static; >0 = dashed/glow pulses travel along lines. Higher = faster motion. Creates energy-flow visual effects."},
+      {name:"connectionMinDist",type:"F",min:"0",avg:"0",max:"500",imp:0,loc:2,scope:"R",live:"Yes",desc:"Minimum distance for drawing a connection line. Ignores particles that are too close. 0 = draw all; >50 = skip very close pairs. Reduces visual clutter in dense clusters."},
+      {name:"connectionGlowIntensity",type:"F",min:"0",avg:"0",max:"2",imp:0,loc:3,scope:"R",live:"Yes",desc:"Separate glow intensity for connection lines. 0 = no glow; 1 = moderate glow; >1.5 = bright luminous connections. Independent from particle glow settings."},
+      {name:"connectionThicknessBySpecies",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"When on, connection line thickness varies based on the species pair. Creates visual weight for different interactions. Off = uniform thickness based on connectionWidth."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Rendering",
+    sub:"Quality",
+    params:[
+      {name:"renderQuality",type:"F",min:"0.25",avg:"1",max:"1",imp:0,loc:5,scope:"R",live:"Yes",desc:"Resolution scale factor for glow, connections, and culling passes (0.25–1). 1 = full quality; 0.5 = half-res for 4× fill-rate savings. Auto-degraded further by adaptiveQuality when FPS drops."},
+      {name:"adaptiveQuality",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"Automatically reduces renderQuality when frame rate drops below 20 FPS, and recovers when above 40 FPS. Helps maintain playable performance on varied hardware without manual tuning."},
+      {name:"gridOpacity",type:"F",min:"0",avg:"0.15",max:"0.5",imp:1,loc:3,scope:"R",live:"Yes",desc:"Opacity multiplier for the background grid overlay (0–0.5). Controls how visible the world grid lines are. 0 = no grid; 0.15 = subtle guidance; >0.3 = prominent structural lines."},
+      {name:"particleOpacity",type:"F",min:"0.2",avg:"1.0",max:"1",imp:1,loc:5,scope:"R",live:"Yes",desc:"Global opacity multiplier applied to all particle fills and glows (0.2–1). Lower values create a faded, ghostly aesthetic. 1 = fully opaque; 0.5 = semi-transparent; <0.3 = barely visible traces."},
+      {name:"antiAliasing",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"Sub-pixel rendering for smoother particle edges. Off = faster; On = smoother."},
+      {name:"resolutionScale",type:"F",min:"0.25",avg:"1",max:"2",imp:1,loc:4,scope:"R",live:"Yes",desc:"Internal render scale. 0.5=half-res fast; 1=full; 2=2x supersampling sharp but slow."},
+      {name:"particleLOD",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:4,scope:"R",live:"Yes",desc:"Level-of-detail simplification for distant particles. 0=none; 0.5=half dist; 1=aggressive."},
+      {name:"targetFPS",type:"I",min:"15",avg:"60",max:"120",imp:1,loc:3,scope:"R",live:"Yes",desc:"Target FPS for render loop. 30=save battery; 60=smooth; 120=high refresh."},
+      {name:"dynamicResolution",type:"B",min:"—",avg:"false",max:"—",imp:1,loc:5,scope:"R",live:"Yes",desc:"Auto-adjust resolutionScale to maintain targetFPS."},
+      {name:"pixelRatioOverride",type:"F",min:"0.5",avg:"1",max:"3",imp:0,loc:3,scope:"R",live:"Yes",desc:"Override device pixel ratio. 1=standard; 2=retina; >2=supersampled. 0=auto."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Rendering",
+    sub:"Style",
+    params:[
+      {name:"connectionOpacity",type:"F",min:"0",avg:"0.08",max:"0.5",imp:0,loc:4,scope:"R",live:"Yes",desc:"Base opacity of inter-particle connection lines. 0 = invisible connections; 0.08 = subtle web; 0.5 = prominent, bright connections. Scaled by distance fade and per-pair species affinity."},
+      {name:"connectionWidth",type:"F",min:"0.1",avg:"0.4",max:"3",imp:0,loc:3,scope:"R",live:"Yes",desc:"Stroke width of connection lines in pixels. Thicker lines are more visible but can clutter the view. 0.4 = fine web; 1 = moderate; >2 = bold, chunky connections."},
+      {name:"connectionFade",type:"F",min:"0.5",avg:"2",max:"4",imp:0,loc:5,scope:"R",live:"Yes",desc:"Exponent for distance-based connection opacity fade. 1 = linear fade; 2 = quadratic (sharper edge); >3 = very sharp cutoff — connections stay bright until near max distance then vanish quickly."},
+      {name:"starBrightness",type:"F",min:"0",avg:"0.35",max:"1",imp:0,loc:4,scope:"R",live:"Yes",desc:"Brightness multiplier for the background star field. 0 = no stars; 0.35 = subtle backdrop; 1 = prominent starry sky. Stars are only visible when trails are off or faint."},
+      {name:"starDensity",type:"F",min:"0.25",avg:"1",max:"3",imp:0,loc:3,scope:"R",live:"Yes",desc:"Multiplier for background star count density. 1 = default count; 0.5 = half the stars; 2 = double density. Higher density creates a richer night-sky effect but may visually compete with particles."},
+      {name:"depthCue",type:"F",min:"0",avg:"0.5",max:"1",imp:1,loc:4,scope:"R",live:"Yes",desc:"How strongly Z-depth affects particle opacity. 0 = all particles equally visible regardless of depth; 0.5 = moderate fade with distance; 1 = strong depth cue — far particles nearly invisible. Creates atmospheric perspective."},
+      {name:"minRadius",type:"F",min:"0.2",avg:"0.5",max:"3",imp:0,loc:3,scope:"R",live:"Yes",desc:"Minimum rendered particle radius in pixels. Prevents particles from becoming too small to see when zoomed out. 0.5 = tiny dots; 1 = small but visible; >2 = always chunky regardless of zoom."},
+      {name:"maxRadius",type:"F",min:"3",avg:"12",max:"20",imp:0,loc:3,scope:"R",live:"Yes",desc:"Maximum rendered particle radius in pixels. Prevents particles from becoming oversized when zoomed in. 12 = generous size; <8 = conservative; 20 = very large, potentially overlapping particles."},
+      {name:"glowSpread",type:"F",min:"0.5",avg:"1",max:"5",imp:1,loc:3,scope:"R",live:"Yes",desc:"Multiplier for the glow bloom radius. 1 = standard spread; 2 = twice the radius (softer, wider halos); 0.5 = tight, pinpoint glow. Larger values increase GPU fill cost. Pairs with glowIntensity for overall glow character."},
+      {name:"hdrExposure",type:"F",min:"0.5",avg:"1",max:"3",imp:1,loc:3,scope:"R",live:"Yes",desc:"Brightness exposure curve compression for glow rendering. 1 = standard; <1 = darker, more subdued; >1.5 = brighter, blown-out highlights. Affects how glow intensity maps to visible brightness."},
+      {name:"saturationBoost",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:4,scope:"R",live:"Yes",desc:"Extra color saturation applied above each species' base saturation. 0 = no change; 0.5 = moderate vividness increase; 1 = maxed-out, hyper-saturated colors. Works additively on top of per-species saturation."},
+      {name:"borderGlow",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:5,scope:"R",live:"Yes",desc:"Glow effect emitted from the world boundary rectangle. Creates a luminous containment field effect. 0 = off; 0.3 = subtle rim light; 1 = bright, prominent border with shadow glow."},
+      {name:"trailGap",type:"I",min:"1",avg:"1",max:"10",imp:0,loc:3,scope:"R",live:"Yes",desc:"Frame interval for full render passes. 1 = every frame (normal); 3 = every 3rd frame (performance saving). Physics continues running on skipped frames. Creates a stroboscopic time-lapse effect at higher values."},
+      {name:"colorShift",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:3,scope:"R",live:"Yes",desc:"Global hue rotation applied to all species' colors. 0 = no change; 180 = complementary shift; 360 = full cycle. Shifts the entire palette without changing individual species relationships."},
+      {name:"particleContrast",type:"F",min:"0.5",avg:"1",max:"2",imp:0,loc:3,scope:"R",live:"Yes",desc:"Particle core-to-edge contrast ratio. 1 = standard (size-based); >1 = larger, more prominent cores; <1 = smaller, more delicate dots. Affects the perceived solidity and visual weight of particles."},
+      {name:"starTwinkle",type:"F",min:"0",avg:"0.3",max:"1",imp:0,loc:3,scope:"R",live:"Yes",desc:"Background star twinkle animation speed. 0 = static stars; 0.3 = gentle pulsing (default); 1 = rapid shimmer. Higher values create more dynamic but potentially distracting backdrops."},
+      {name:"particleShape",type:"E",min:"—",avg:"circle",max:"—",imp:1,loc:5,scope:"R",live:"Yes",desc:"Particle shape: circle, square, diamond, triangle, ring, star."},
+      {name:"particleRotation",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:4,scope:"R",live:"Yes",desc:"Fixed rotation for non-circle shapes in degrees."},
+      {name:"particleRotateToVelocity",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:2,scope:"R",live:"Yes",desc:"Non-circle shapes orient to velocity direction."},
+      {name:"sizeJitter",type:"F",min:"0",avg:"0",max:"0.5",imp:0,loc:3,scope:"R",live:"Yes",desc:"Random per-particle size variation. 0=uniform; 0.2=20% variety."},
+      {name:"colorNoiseHue",type:"F",min:"0",avg:"0",max:"30",imp:0,loc:3,scope:"R",live:"Yes",desc:"Random hue shift per particle. 0=uniform; 5=subtle; >15=rainbow."},
+      {name:"colorNoiseSaturation",type:"F",min:"0",avg:"0",max:"50",imp:0,loc:2,scope:"R",live:"Yes",desc:"Random saturation shift per particle."},
+      {name:"backgroundGradient",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:6,scope:"R",live:"Yes",desc:"Radial gradient background instead of flat. Disables stars."},
+      {name:"ambientDust",type:"F",min:"0",avg:"0",max:"0.5",imp:0,loc:5,scope:"R",live:"Yes",desc:"Floating ambient dust density. 0=none; 0.1=sparse; >0.3=heavy. Non-interactive decoration."},
+      {name:"chromaticAberration",type:"F",min:"0",avg:"0",max:"5",imp:0,loc:5,scope:"R",live:"Yes",desc:"Lens chromatic aberration. 0=none; 0.5=subtle; >2=dramatic fringing."},
+      {name:"specularHighlight",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:3,scope:"R",live:"Yes",desc:"Specular shine dot on particles. 0=matte; 0.3=subtle; >0.7=glossy."},
+      {name:"particleShadow",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:4,scope:"R",live:"Yes",desc:"Drop shadows on particles for depth perception."},
+]
+  },
+  {
+    super:"Global Config",
+    cat:"Rendering",
+    sub:"Overlay",
+    params:[
+      {name:"showStats",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:4,scope:"R",live:"Yes",desc:"Overlays real-time FPS counter, frame render time (ms), visible particle count, and per-species population bars in the top-right corner. Useful for performance debugging."},
+      {name:"showWorldBorder",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:5,scope:"R",live:"Yes",desc:"Draws the world boundary rectangle and a subtle grid overlay. Grid spacing adapts to camera zoom. Helps visualize world extents and particle distribution within bounds."},
+      {name:"showLegend",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:5,scope:"R",live:"Yes",desc:"Species color legend overlay showing name, swatch, and count."},
+      {name:"showMinimap",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:8,scope:"R",live:"Yes",desc:"World overview minimap in corner. Yellow rectangle = viewport."},
+      {name:"showGridOverlay",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:3,scope:"R",live:"Yes",desc:"Debug spatial grid overlay showing partition boundaries."},
+      {name:"showFPGGraph",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:6,scope:"R",live:"Yes",desc:"Real-time FPS sparkline graph for performance monitoring."},
+      {name:"overlayOpacity",type:"F",min:"0.1",avg:"0.8",max:"1",imp:0,loc:2,scope:"R",live:"Yes",desc:"Global opacity for all overlay elements."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"World",
+    sub:"Dimensions",
+    params:[
+      {name:"worldWidth",type:"I",min:"200",avg:"2500",max:"10000",imp:2,loc:8,scope:"B",live:"Yes",desc:"Width of the simulated world in arbitrary world units. Determines spawn area and movement boundaries. Larger worlds need more particles to maintain density. Coupled with worldHeight for aspect ratio."},
+      {name:"worldHeight",type:"I",min:"200",avg:"1406",max:"10000",imp:2,loc:8,scope:"B",live:"Yes",desc:"Height of the simulated world in arbitrary world units. Together with worldWidth defines the total playable area. Initialized to match device aspect ratio at config build time."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"World",
+    sub:"Edge",
+    params:[
+      {name:"edgeMode",type:"E",min:"—",avg:"wrap",max:"—",imp:3,loc:11,scope:"E",live:"Yes",desc:"How particles behave at world boundaries. wrap = toroidal wrapping (infinite space); bounce = elastic collision with walls; contain = dampened reflection with velocity reduction."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"World",
+    sub:"Z-Space",
+    params:[
+      {name:"zRange",type:"F",min:"10",avg:"10000",max:"10000",imp:1,loc:9,scope:"B",live:"Yes",desc:"Depth range of the Z-axis in world units. Controls how much depth particles can distribute through. Larger values create more pronounced parallax layers, smaller values keep particles planar."},
+      {name:"stackPerspective",type:"F",min:"0",avg:"2",max:"10",imp:1,loc:5,scope:"B",live:"Yes",desc:"Controls how strongly Z-depth affects on-screen scale and position. 0 = flat 2D (no perspective); 2 = mild depth; 10 = extreme foreshortening. Applied via quadratic scaling formula."},
+      {name:"worldRotation",type:"F",min:"0",avg:"0",max:"360",imp:0,loc:4,scope:"E",live:"Yes",desc:"Global world rotation angle in degrees. Rotates entire simulation space including particles and forces."},
+      {name:"gravityAngle",type:"F",min:"0",avg:"270",max:"360",imp:0,loc:3,scope:"E",live:"Yes",desc:"Direction of constant gravitational pull in degrees. 270=down; 90=up."},
+      {name:"edgeDecayZone",type:"F",min:"0",avg:"50",max:"500",imp:0,loc:3,scope:"E",live:"Yes",desc:"Distance from boundary where edge forces begin ramping. Creates soft-edge feel."},
+      {name:"worldWrapOverlap",type:"F",min:"0",avg:"0",max:"200",imp:0,loc:3,scope:"E",live:"Yes",desc:"Overlap zone width for wrap edge mode. Smooth transition across boundary."},
+      {name:"worldCurvature",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:5,scope:"E",live:"Yes",desc:"World curvature toward toroidal topology. 0=flat; 0.5=moderate; 1=full toroidal wrap."},
+    ]
+  },
+  {
+    super:"Global Config",
+    cat:"Distribution",
+    sub:"Modes",
+    params:[
+      {name:"distributionMode",type:"E",min:"—",avg:"random",max:"—",imp:2,loc:9,scope:"E",live:"No",desc:"Initial particle spawn layout pattern. random = uniform scatter; grid = evenly spaced rows/cols with slight jitter; cluster = grouped in random blobs; ring = concentric radial distribution."},
+      {name:"initialVelocity",type:"E",min:"—",avg:"random",max:"—",imp:2,loc:5,scope:"E",live:"No",desc:"Initial velocity profile applied to all particles at spawn. random = varied directions; zero = stationary; slow/fast = gentle/aggressive speed spread; radial = outward from center."},
+      {name:"clusterCount",type:"I",min:"1",avg:"8",max:"30",imp:0,loc:5,scope:"E",live:"No",desc:"Number of spawn clusters when distributionMode = cluster. Each cluster is a random focal point. More clusters = more nucleation sites."},
+      {name:"clusterSpread",type:"I",min:"50",avg:"400",max:"2500",imp:0,loc:5,scope:"E",live:"No",desc:"Radius of each spawn cluster in world units. Larger = more diffuse; smaller = tighter groups."},
+      {name:"ringRadius",type:"I",min:"100",avg:"1000",max:"2500",imp:0,loc:6,scope:"E",live:"No",desc:"Radius of ring spawn pattern when distributionMode = ring."},
+      {name:"spawnDensityMap",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:5,scope:"E",live:"No",desc:"Spatial density variation for spawn. 0=uniform; 0.5=hot spots; 1=extreme variation."},
+      {name:"shuffleOnReset",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:2,scope:"E",live:"No",desc:"Change random seed on each reset for varied spawn configurations."},
+      {name:"spawnNoiseType",type:"E",min:"—",avg:"uniform",max:"—",imp:0,loc:3,scope:"E",live:"No",desc:"Spawn noise distribution: uniform, gaussian, ringworld."},
+      {name:"speciesDistribution",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:4,scope:"E",live:"No",desc:"Per-species independent distribution modes when enabled."},
+      {name:"spawnGroupSize",type:"I",min:"1",avg:"1",max:"10",imp:0,loc:3,scope:"E",live:"No",desc:"Particles per spawn point. 1=individual; 2=pairs; >3=clusters."},
+    ]
+  },
+  {
+    super:"Species Config",
+    cat:"",
+    sub:"Identity",
+    params:[
+      {name:"name",type:"S",min:"—",avg:"Cyan/Magenta/Lime/Gold/Coral",max:"—",imp:0,loc:30,scope:"R",live:"Yes",desc:"Display name for this species, shown in species tabs, stats overlay, and the interaction matrix headers. Should be short and descriptive (e.g., Cyan, Prey, Toxin)."},
+      {name:"hue",type:"I",min:"—",avg:"185/310/120/45/10",max:"—",imp:1,loc:21,scope:"R",live:"Yes",desc:"HSL hue angle (0–360°) determining the base color of this species' particles. Also used for matrix cell tinting and stats bar colors. 0=red, 120=green, 240=blue — defaults form a distinct palette."},
+      {name:"saturation",type:"I",min:"—",avg:"90/85/80/95/80",max:"—",imp:1,loc:20,scope:"R",live:"Yes",desc:"HSL saturation percentage (0–100%) controlling color intensity. Higher = more vivid particles. Lower = muted, pastel tones. Defaults range 80–95% for clear species differentiation."},
+      {name:"lightness",type:"I",min:"—",avg:"65/60/55/60/60",max:"—",imp:1,loc:20,scope:"R",live:"Yes",desc:"HSL lightness percentage (20–90%) controlling particle brightness. Higher = brighter, more luminous particles. Above 80% starts washing out the hue. Below 30% becomes very dark."},
+    ]
+  },
+  {
+    super:"Species Config",
+    cat:"",
+    sub:"Population",
+    params:[
+      {name:"count",type:"I",min:"10",avg:"1000",max:"3000",imp:3,loc:31,scope:"E",live:"No",desc:"Number of particles allocated to this species. Total particles across all species determines overall CPU/GPU load. Higher counts create denser emergent patterns but reduce performance."},
+    ]
+  },
+  {
+    super:"Species Config",
+    cat:"",
+    sub:"Movement",
+    params:[
+      {name:"maxSpeed",type:"F",min:"1",avg:"60/55/65/50/55",max:"300",imp:3,loc:13,scope:"E",live:"Yes",desc:"Maximum world-unit-per-frame speed cap for this species' particles. Prevents runaway acceleration. Species with higher max speeds can escape clusters and explore the world more rapidly."},
+    ]
+  },
+  {
+    super:"Species Config",
+    cat:"",
+    sub:"Appearance",
+    params:[
+      {name:"size",type:"F",min:"0.5",avg:"3.5/3/2.5/4/3",max:"12",imp:1,loc:20,scope:"R",live:"Yes",desc:"Particle radius in world units. Affects visual presence and glow size. Larger particles are more visible but overlap more. Z-perspective scaling may further reduce apparent size at depth."},
+    ]
+  },
+  {
+    super:"Species Config",
+    cat:"",
+    sub:"Interaction Physics",
+    params:[
+      {name:"interactionRadius",type:"F",min:"50",avg:"600/550/500/700/600",max:"5000",imp:3,loc:19,scope:"E",live:"Yes",desc:"Maximum world-unit distance at which this species can detect and respond to other particles. Larger radius = broader awareness but higher computational cost (O(n²) neighborhood checks)."},
+      {name:"repulsionRadius",type:"I",min:"10",avg:"80/70/65/90/75",max:"800",imp:3,loc:16,scope:"E",live:"Yes",desc:"Hard exclusion zone radius — particles closer than this distance experience repulsion force regardless of matrix values. Prevents overlap and clustering artifacts. Must be < interactionRadius."},
+      {name:"repulsionStrength",type:"F",min:"0.1",avg:"1.2/1.1/1.3/0.9/1.0",max:"3",imp:3,loc:13,scope:"E",live:"Yes",desc:"Multiplier for the hard-repulsion force when particles enter the repulsion zone. Higher = more aggressive separation; lower = softer avoidance. Smoothly ramps from zero at zone edge to full at center."},
+    ]
+  },
+  {
+    super:"Runtime State",
+    cat:"View",
+    sub:"Camera",
+    params:[
+      {name:"camX",type:"F",min:"—",avg:"=",max:"—",imp:2,loc:10,scope:"B",live:"Yes",desc:"Camera's horizontal offset in screen pixels. Adjusted via two-finger pan (touch) or programmatically via fitCamera(). Runtime state, not a configurable simulation parameter."},
+      {name:"camY",type:"F",min:"—",avg:"=",max:"—",imp:2,loc:10,scope:"B",live:"Yes",desc:"Camera's vertical offset in screen pixels. Adjusted via two-finger pan (touch) or programmatically via fitCamera(). Runtime state, not a configurable simulation parameter."},
+      {name:"camZoom",type:"F",min:"0.05",avg:"=",max:"20",imp:2,loc:20,scope:"B",live:"Yes",desc:"Camera zoom level (0.05–20). 1 = 1:1 pixel-to-world ratio. Higher = zoomed in; lower = zoomed out. Adjusted via pinch gesture or fitCamera(). Runtime camera state."},
+    ]
+  },
+  {
+    super:"Runtime State",
+    cat:"Performance",
+    sub:"Performance Metrics",
+    params:[
+      {name:"fps",type:"I",min:"—",avg:"—",max:"—",imp:1,loc:20,scope:"R",live:"Yes",desc:"Smoothed frames-per-second measurement, averaged over recent frames via counter-based sampling. Indicates overall rendering and simulation performance health. Target: ≥30 FPS."},
+      {name:"frameTime",type:"F",min:"—",avg:"—",max:"—",imp:0,loc:10,scope:"R",live:"Yes",desc:"Time taken (ms) by the most recent render frame's draw calls, excluding physics. Spikes indicate GPU bottlenecks (too many particles, glow, or connections). Measured via performance.now()."},
+      {name:"visibleCount",type:"I",min:"—",avg:"—",max:"—",imp:0,loc:8,scope:"R",live:"Yes",desc:"Number of particles surviving Z-cull and viewport culling for the current frame. Less than total when particles are outside view or beyond Z-range. Indicates effective draw load."},
+      {name:"particleCount",type:"I",min:"—",avg:"—",max:"—",imp:1,loc:10,scope:"R",live:"Yes",desc:"Total number of particles currently alive across all species. Sum of all species counts. Determines base CPU load for physics and GPU load for rendering."},
+      {name:"_autoQuality",type:"F",min:"0.3",avg:"1",max:"1",imp:0,loc:4,scope:"R",live:"Yes",desc:"Internal adaptive quality multiplier (0.3–1) automatically adjusted by adaptiveQuality logic. 1 = full quality; <0.5 = reduced glow/connection resolution. Read-only diagnostic."},
+    ]
+  },
+  {
+    super:"Presets",
+    cat:"",
+    sub:"Metadata",
+    params:[
+      {name:"preset name",type:"S",min:"—",avg:"Spiralis",max:"—",imp:1,loc:11,scope:"U",live:"Yes",desc:"Display name for the currently loaded preset, shown in the preset selection grid. Includes an emoji icon for visual identification (e.g., 🌀 Spiralis, 🧬 Primordia)."},
+      {name:"preset desc",type:"S",min:"—",avg:"~",max:"—",imp:0,loc:9,scope:"U",live:"Yes",desc:"One-line description of the preset's characteristic emergent behavior. Helps users understand what visual/simulation style each preset produces before selecting it."},
+    ]
+  },
+];
+
+
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function nameToDisplay(s) {
+  return s.replace(/^_/, '').replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
+}
+
+function typeLabel(t) {
+  return {F:'Float',I:'Integer',B:'Boolean',E:'Enum',S:'String'}[t]||t;
+}
+function typeBadge(p) {
+  return `<span class="tbadge tbadge-${esc(p.type)}" title="Type: ${typeLabel(p.type)}">${esc(p.type)}</span>`;
+}
+function scopeLabel(s) {
+  return {E:'Engine',R:'Renderer',B:'Both',U:'UI'}[s]||s;
+}
+function scopeBadge(p) {
+  return `<span class="scope-badge scope-${esc(p.scope)}" title="Scope: ${scopeLabel(p.scope)}">${esc(p.scope)}</span>`;
+}
+
+function impTitle(p) {
+  return {3:'Critical importance',2:'High importance',1:'Medium importance',0:'Low importance'}[p.imp]||'Importance: '+p.imp;
+}
+function liveTitle(p) {
+  return p.live==='Yes'?'Updates in real-time':'Requires simulation reset';
+}
+function liveBadge(p) {
+  return `<span class="live-badge live-${p.live==='Yes'?'yes':'no'}" title="${liveTitle(p)}">${p.live==='Yes'?'Y':'N'}</span>`;
+}
+
+
+function needLabel(n) {
+  return {S:'S',D:'D',B:'B',F:'F'}[n]||n;
+}
+function needTitle(n) {
+  return {S:'Supplies — constrains another param',D:'Depends — constrained by another param',B:'Both constrains and depends',F:'Free — no constraints'}[n]||n;
+}
+function needBadge(p) {
+  return `<span class="need-badge need-${p._need}" title="${needTitle(p._need)}">${needLabel(p._need)}</span>`;
+}
+function docBadge(p) {
+  return `<span class="doc-badge doc-${p._doc}" title="Doc Gaps: ${p._doc===3?'Stub (<20 chars)':p._doc===2?'Minimal (20-40 chars)':p._doc===1?'Partial (40-60 chars)':'Complete (60+ chars)'}">${p._doc}</span>`;
+}
+function dconfBadge(p) {
+  return `<span class="dconf-badge dconf-${p._dconf}" title="Default Confidence: ${p._dconf==='H'?'Per-species tuned':p._dconf==='M'?'Single global default':p._dconf==='L'?'Dynamic / calculated':'Varies by preset'}">${p._dconf}</span>`;
+}
+function cadenceBadge(p) {
+  return `<span class="cadence-badge cadence-${p._cadence}" title="Tuning Cadence: ${p._cadence==='F'?'Frequent — tweaked constantly':p._cadence==='O'?'Occasional — set & forget':p._cadence==='R'?'Rare — init/preset only':'Readonly'}">${p._cadence}</span>`;
+}
+function groupBadge(p) {
+  return `<span class="group-badge group-${p._super}" title="Group: ${p._super==='G'?'Global Config':p._super==='S'?'Species Config':p._super==='R'?'Runtime State':'Presets'}">${p._super}</span>`;
+}
+function roleBadge(p) {
+  return `<span class="role-badge role-${p._role}" title="Role: ${p._role==='P'?'Physics':p._role==='R'?'Rendering':p._role==='W'?'World':p._role==='D'?'Distribution':p._role==='I'?'Input':p._role==='C'?'Camera':p._role==='F'?'Performance':'Metadata'}">${p._role}</span>`;
+}
+function boundBadge(p) {
+  return `<span class="bound-badge bound-${p._bound}" title="Boundedness: ${p._bound==='B'?'Both min and max bounds':p._bound==='O'?'One-sided bound':p._bound==='U'?'Unbounded':'Not applicable'}">${p._bound}</span>`;
+}
+
+
+function ctrlLabel(c) {
+  return {S:'S',T:'T',D:'D',B:'B','--':'--'}[c]||c;
+}
+function ctrlTitle(c) {
+  return {S:'Slider',T:'Toggle',D:'Dropdown',B:'Button','--':'None'}[c]||c;
+}
+
+
+function precBadge(p) {
+  const c = p._prec;
+  return `<span class="prec-badge prec-${c}" title="${c==='C'?'Continuous (float)':c==='D'?'Discrete (integer)':'Not applicable'}">${c}</span>`;
+}
+function renderParams(params, view) {
+  if (!view) view = 'full';
+  const views = {
+    badges: ['<th class="sortable" data-sort-key="name">Parameter</th>', '<th class="sortable" data-sort-key="badges">Badges</th>', '<th class="sortable" data-sort-key="imp">Counts</th>'],
+    descriptions: ['<th class="sortable" data-sort-key="name">Parameter</th>', '<th class="sortable" data-sort-key="desc">Description</th>'],
+    fields: ['<th class="sortable" data-sort-key="name">Parameter</th>', '<th class="sortable" data-sort-key="min">Value</th>'],
+    full: ['<th class="sortable" data-sort-key="name">Parameter</th>', '<th class="sortable" data-sort-key="badges">Badges</th>', '<th class="sortable" data-sort-key="imp">Counts</th>', '<th class="sortable" data-sort-key="min">Value</th>', '<th class="sortable" data-sort-key="desc">Description</th>']
+  };
+  const cols = views[view] || views.full;
+  let h = '<table><thead><tr>' + cols.join("") + '</tr></thead><tbody>';
+  for (const p of params) {
+    const badges = `${typeBadge(p)}${precBadge(p)}${docBadge(p)}${dconfBadge(p)}${scopeBadge(p)}${needBadge(p)}${boundBadge(p)}<span class="ctrl-badge ctrl-${p._ctrl}" title="${ctrlTitle(p._ctrl)}">${ctrlLabel(p._ctrl)}</span>${cadenceBadge(p)}${groupBadge(p)}${roleBadge(p)}${liveBadge(p)}`;
+    const numBadges = `<span class="imp-badge imp-${p.imp}" title="${impTitle(p)}">${p.imp}</span><span class="loc-badge" title="${p.loc} lines of code">${p.loc}</span>`;
+    const disp = nameToDisplay(p.name);
+    const valCell = `<td class="param-value"><span class="v-min">${esc(p.min)}</span><span class="v-def">${esc(p.avg)}</span><span class="v-max">${esc(p.max)}</span></td>`;
+    const numCol = `<td class="param-nums">${numBadges}</td>`;
+    const cells = {
+      badges: `<td class="param-name">${esc(disp)}</td><td class="param-badges">${badges}</td>${numCol}`,
+      descriptions: `<td class="param-name">${esc(disp)}</td><td class="desc">${esc(p.desc)}</td>`,
+      fields: `<td class="param-name">${esc(disp)}</td>${valCell}`,
+      full: `<td class="param-name">${esc(disp)}</td><td class="param-badges">${badges}</td>${numCol}${valCell}<td class="desc">${esc(p.desc)}</td>`
+    };
+    h += '<tr>' + (cells[view] || cells.full) + '</tr>';
+  }
+  return h + '</tbody></table>';
+}
+
+const superMap = {};
+for (const item of DATA) {
+  for (const p of item.params) {
+    p._sub = item.sub;
+    p._super = item.super === 'Global Config' ? 'G' : item.super === 'Species Config' ? 'S' : item.super === 'Runtime State' ? 'R' : 'P';
+    const roleMap = {
+      'Physics':'P','Rendering':'R','World':'W','Distribution':'D','Input':'I','Camera':'C','Performance':'F','Presets':'P'
+    };
+    const rawCat = item.cat || '';
+    p._role = roleMap[rawCat] || rawCat.slice(0,1) || '—';
+    if (p.name === '_autoQuality') p._ctrl = '--';
+    if (p.name === 'adaptiveQuality') p._ctrl = 'T';
+    if (p.name === 'attractForce') p._ctrl = 'S';
+    if (p.name === 'attractRadius') p._ctrl = 'S';
+    if (p.name === 'camX') p._ctrl = '--';
+    if (p.name === 'camY') p._ctrl = '--';
+    if (p.name === 'camZoom') p._ctrl = '--';
+    if (p.name === 'clusterCount') p._ctrl = 'S';
+    if (p.name === 'clusterSpread') p._ctrl = 'S';
+    if (p.name === 'connectionDistance') p._ctrl = 'S';
+    if (p.name === 'connectionsEnabled') p._ctrl = 'S';
+    if (p.name === 'count') p._ctrl = 'S';
+    if (p.name === 'distributionMode') p._ctrl = 'D';
+    if (p.name === 'edgeMode') p._ctrl = 'D';
+    if (p.name === 'fps') p._ctrl = '--';
+    if (p.name === 'frameTime') p._ctrl = '--';
+    if (p.name === 'friction') p._ctrl = 'S';
+    if (p.name === 'glowIntensity') p._ctrl = 'S';
+    if (p.name === 'hue') p._ctrl = 'S';
+    if (p.name === 'initialVelocity') p._ctrl = 'D';
+    if (p.name === 'interactionRadius') p._ctrl = 'S';
+    if (p.name === 'lightness') p._ctrl = 'S';
+    if (p.name === 'maxForce') p._ctrl = 'S';
+    if (p.name === 'maxSpeed') p._ctrl = 'S';
+    if (p.name === 'name') p._ctrl = 'S';
+    if (p.name === 'noiseAmount') p._ctrl = 'S';
+    if (p.name === 'particleCount') p._ctrl = '--';
+    if (p.name === 'physicsRate') p._ctrl = 'S';
+    if (p.name === 'preset desc') p._ctrl = 'B';
+    if (p.name === 'preset name') p._ctrl = 'B';
+    if (p.name === 'renderQuality') p._ctrl = 'T';
+    if (p.name === 'repulsionRadius') p._ctrl = 'S';
+    if (p.name === 'repulsionStrength') p._ctrl = 'S';
+    if (p.name === 'ringRadius') p._ctrl = 'S';
+    if (p.name === 'saturation') p._ctrl = 'S';
+    if (p.name === 'showGlow') p._ctrl = 'S';
+    if (p.name === 'showStats') p._ctrl = 'T';
+    if (p.name === 'showWorldBorder') p._ctrl = 'T';
+    if (p.name === 'size') p._ctrl = 'S';
+    if (p.name === 'stackPerspective') p._ctrl = 'S';
+    if (p.name === 'timeScale') p._ctrl = 'S';
+    if (p.name === 'trailOpacity') p._ctrl = 'S';
+    if (p.name === 'trailsEnabled') p._ctrl = 'S';
+    if (p.name === 'visibleCount') p._ctrl = '--';
+    if (p.name === 'worldHeight') p._ctrl = 'S';
+    if (p.name === 'worldWidth') p._ctrl = 'S';
+    if (p.name === 'zRange') p._ctrl = 'S';
+    if (p.name === 'minSpeed') p._ctrl = 'S';
+    if (p.name === 'repulsionFalloff') p._ctrl = 'S';
+    if (p.name === 'harmonicStrength') p._ctrl = 'S';
+    if (p.name === 'harmonicRange') p._ctrl = 'S';
+    if (p.name === 'wanderRate') p._ctrl = 'S';
+    if (p.name === 'noiseFieldScale') p._ctrl = 'S';
+    if (p.name === 'noiseFieldStrength') p._ctrl = 'S';
+    if (p.name === 'velocityClip') p._ctrl = 'T';
+    if (p.name === 'bounceFriction') p._ctrl = 'S';
+    if (p.name === 'bounceRandomize') p._ctrl = 'S';
+    if (p.name === 'spawnJitter') p._ctrl = 'S';
+    if (p.name === 'worldMargin') p._ctrl = 'S';
+    if (p.name === 'connectionOpacity') p._ctrl = 'S';
+    if (p.name === 'connectionWidth') p._ctrl = 'S';
+    if (p.name === 'connectionFade') p._ctrl = 'S';
+    if (p.name === 'starBrightness') p._ctrl = 'S';
+    if (p.name === 'starDensity') p._ctrl = 'S';
+    if (p.name === 'depthCue') p._ctrl = 'S';
+    if (p.name === 'minRadius') p._ctrl = 'S';
+    if (p.name === 'maxRadius') p._ctrl = 'S';
+    if (p.name === 'forceInertia') p._ctrl = 'S';
+    if (p.name === 'interactionSymmetry') p._ctrl = 'S';
+    if (p.name === 'pairwiseSkipChance') p._ctrl = 'S';
+    if (p.name === 'centerBias') p._ctrl = 'S';
+    if (p.name === 'boundaryWarmth') p._ctrl = 'S';
+    if (p.name === 'radialDrift') p._ctrl = 'S';
+    if (p.name === 'noiseDrift') p._ctrl = 'S';
+    if (p.name === 'jerkLimit') p._ctrl = 'S';
+    if (p.name === 'zGravity') p._ctrl = 'S';
+    if (p.name === 'velocityDecayAngle') p._ctrl = 'S';
+    if (p.name === 'velocityExchange') p._ctrl = 'S';
+    if (p.name === 'glowSpread') p._ctrl = 'S';
+    if (p.name === 'hdrExposure') p._ctrl = 'S';
+    if (p.name === 'saturationBoost') p._ctrl = 'S';
+    if (p.name === 'borderGlow') p._ctrl = 'S';
+    if (p.name === 'trailGap') p._ctrl = 'S';
+    if (p.name === 'colorShift') p._ctrl = 'S';
+    if (p.name === 'particleContrast') p._ctrl = 'S';
+    if (p.name === 'starTwinkle') p._ctrl = 'S';
+    if (p.name === 'gravityWell') p._ctrl = 'S';
+    if (p.name === 'gravityWellRadius') p._ctrl = 'S';
+    if (p.name === 'vortexStrength') p._ctrl = 'S';
+    if (p.name === 'bounceRestitution') p._ctrl = 'S';
+    if (p.name === 'massVariation') p._ctrl = 'S';
+    if (p.name === 'forceDecayPower') p._ctrl = 'S';
+    if (p.name === 'interactionJitter') p._ctrl = 'S';
+    if (p.name === 'velocityDampingZ') p._ctrl = 'S';
+    if (p.name === 'dragLinear') p._ctrl = 'S';
+    if (p.name === 'boundaryRepelForce') p._ctrl = 'S';
+    if (p.name === 'pairwiseCutoff') p._ctrl = 'S';
+    if (p.name === 'matrixDrift') p._ctrl = 'S';
+    if (p.name === 'gridOpacity') p._ctrl = 'S';
+    if (p.name === 'particleOpacity') p._ctrl = 'S';
+    // Volatility: how skewed the default is within its range (commented out — unused)
+    // if (p.min !== '—' && p.max !== '—' && p.avg !== '—' && p.min !== '0.05') {
+    //   const min = parseFloat(p.min), max = parseFloat(p.max), avg = parseFloat(p.avg);
+    //   if (!isNaN(min) && !isNaN(max) && !isNaN(avg) && max > min) {
+    //     const skew = Math.abs(avg - (min+max)/2) / ((max-min)/2);
+    //     p._vol = skew > 0.7 ? 'V' : skew > 0.35 ? 'H' : 'M';
+    //   } else p._vol = 'L';
+    // } else p._vol = 'L';
+    // Precision: Continuous vs Discrete
+    p._prec = p.type === 'F' ? 'C' : p.type === 'I' ? 'D' : '—';
+    // Source: how the default value is defined
+    if (p.avg === '=') p._src = 'A';
+    else if (p.avg === '~' || p.avg === '~/preset') p._src = 'V';
+    else if (String(p.avg).includes('/')) p._src = 'M';
+    else p._src = 'S';
+    // Need: constrains or depends on other params
+    if (p.name === 'interactionRadius' || p.name === 'worldWidth' || p.name === 'renderQuality') p._need = 'S';
+    else if (p.name === 'repulsionRadius' || p.name === 'worldHeight' || p.name === 'adaptiveQuality') p._need = 'D';
+    else if (p.name === 'fps' || p.name === 'frameTime' || p.name === 'visibleCount' || p.name === 'particleCount') p._need = 'R';
+    else if (p.name === '_autoQuality') p._need = 'D';
+    else p._need = 'F';
+    // Doc Gaps: description quality
+    const dlen = p.desc.length;
+    p._doc = dlen > 60 ? 0 : dlen > 40 ? 1 : dlen > 20 ? 2 : 3;
+    // Default Confidence
+    if (p.avg === '=') p._dconf = 'L';
+    else if (p.avg === '~' || p.avg === '~/preset') p._dconf = '—';
+    else if (p.avg.includes('/')) p._dconf = 'H';
+    else p._dconf = 'M';
+    // Tuning Cadence
+    if (p._ctrl === '--') p._cadence = '—';
+    else if (p.live === 'No') p._cadence = 'R';
+    else if (p._ctrl === 'T') p._cadence = 'O';
+    else p._cadence = 'F';
+    // Cognitive Load
+    let load = 0;
+    if (p.imp === 1 || p.imp === 0) load++;
+    if (p._ctrl === 'D' || p._ctrl === 'B') load++;
+    if (dlen > 50) load++;
+    p._cog = load >= 3 ? 'H' : load >= 1 ? 'M' : 'L';
+    // Boundedness
+    if (p.type === 'B' || p.type === 'E' || p.type === 'S') p._bound = '—';
+    else if (p.min !== '—' && p.max !== '—') p._bound = 'B';
+    else if (p.min !== '—' || p.max !== '—') p._bound = 'O';
+    else p._bound = 'U';
+
+    // Domain: which subsystem this affects (commented out — unused)
+    // if (p.scope === 'E' && (p._sub === 'Dynamics' || p._sub === 'Solver')) p._dom = 'S';
+    // else if (p.scope === 'E' && (p._sub.includes('Distrib') || p._sub === 'Spawn Pattern' || p._sub === 'Cluster' || p._sub === 'Ring')) p._dom = 'I';
+    // else if (p.scope === 'E' && (p._sub === 'Edge' || p._sub === 'Touch Attract')) p._dom = 'S';
+    // else if (p.scope === 'E') p._dom = 'S';
+    // else if (p.scope === 'R' && (p._sub === 'Performance Metrics')) p._dom = 'P';
+    // else if (p.scope === 'R') p._dom = 'R';
+    // else if (p.scope === 'B') p._dom = 'P';
+    // else if (p.scope === 'U') p._dom = 'I';
+    // else p._dom = '—';
+  }
+  if (!superMap[item.super]) {
+    superMap[item.super] = {name:item.super, cats:{}, subs:[]};
+  }
+  if (item.cat) {
+    if (!superMap[item.super].cats[item.cat]) {
+      superMap[item.super].cats[item.cat] = {name:item.cat, subs:[]};
+    }
+    superMap[item.super].cats[item.cat].subs.push(item);
+  } else {
+    superMap[item.super].subs.push(item);
+  }
+}
+
+function countAll(arr) { let c=0; for (const s of arr) c += s.params.length; return c; }
+
+function toggle(el, id) {
+  el.classList.toggle('open');
+  const b = document.getElementById(id);
+  if (b) b.classList.toggle('open');
+}
+
+function renderSub(item, view) {
+  const sid = `sub-${esc(item.super)}-${esc(item.sub)}`;
+  return [
+    '<div class="sub">',
+    `<div class="sub-header open" onclick="toggle(this,'${sid}')">`,
+    '<span class="arrow">▶</span>',
+    `<span>${esc(item.sub)}</span>`,
+    `<span class="count">${item.params.length} params</span>`,
+    '</div>',
+    `<div class="sub-body open" id="${sid}">`,
+    renderParams(item.params, view),
+    '</div></div>'
+  ].join('\n');
+}
+
+function renderTree(superName, view) {
+  const s = superMap[superName];
+  const catNames = Object.keys(s.cats);
+  const h = ['<div class="super">',
+    `<div class="super-header open" onclick="toggle(this,'super-body-${esc(s.name)}')">`,
+    '<span class="arrow">▶</span>',
+    `<span class="label">${esc(s.name)}</span>`,
+    `<span class="count">${countAll(s.subs) + catNames.reduce((a,c)=>a+countAll(s.cats[c].subs),0)} params</span>`,
+    '</div>',
+    `<div class="super-body open" id="super-body-${esc(s.name)}">`];
+  for (const sub of s.subs) {
+    if (sub.cat) continue;
+    h.push(renderSub(sub, view));
+  }
+  for (const cn of catNames) {
+    const cat = s.cats[cn];
+    const cid = `cat-${esc(s.name)}-${esc(cn)}`;
+    const total = countAll(cat.subs);
+    h.push('<div class="cat">',
+      `<div class="cat-header open" onclick="toggle(this,'${cid}')">`,
+      '<span class="arrow">▶</span>',
+      `<span>${esc(cn)}</span>`,
+      `<span class="count">${total} params</span>`,
+      '</div>',
+      `<div class="cat-body open" id="${cid}">`);
+    for (const sub of cat.subs) h.push(renderSub(sub, view));
+    h.push('</div></div>');
+  }
+  h.push('</div></div>');
+  return h.join('\n');
+}
+
+let currentFilter = 'all';
+let currentQuery = '';
+
+function updateSummary() {
+  const total = DATA.reduce((a,s) => a + s.params.length, 0);
+  const visible = document.querySelectorAll('tbody tr:not(.hidden)').length;
+  document.getElementById('summary').innerHTML =
+    `<span><span class="num">${visible}</span> / <span class="num">${total}</span> parameters visible</span>` +
+    `<span><span class="num">${DATA.length}</span> sub-categories</span>` +
+    `<span><span class="num">${Object.keys(superMap).length}</span> super categories</span>` +
+    (currentQuery ? `<span>search: "<span class="num">${esc(currentQuery)}</span>"</span>` : '') +
+    (currentFilter !== 'all' ? `<span>filter: <span class="num">${esc(currentFilter)}</span></span>` : '');
+}
+
+function applySearch() {
+  const q = currentQuery.toLowerCase().trim();
+  const filter = currentFilter;
+  const activeTab = document.querySelector('.tab-content.active');
+  if (!activeTab) return;
+  const rows = activeTab.querySelectorAll('tbody tr');
+  for (const row of rows) {
+    const text = row.textContent.toLowerCase();
+    const impEl = row.querySelector(".imp-badge");
+    const impVal = impEl ? [...impEl.classList].find(c=>c.match(/^imp-[0-9]$/))?.replace("imp-","") : "";
+    const liveNoEl = row.querySelector(".live-no");
+    const liveYesEl = row.querySelector(".live-yes");
+    const isLiveNo = liveNoEl && liveNoEl.textContent === "N";
+    const isLiveYes = liveYesEl && liveYesEl.textContent === "Y";
+    let match = true;
+    if (q && !text.includes(q)) match = false;
+    if (filter !== 'all') {
+      if (filter === 'live-yes') { if (!isLiveYes) match = false; }
+      else if (filter === 'live-no') { if (!isLiveNo) match = false; }
+      else if (impVal !== filter) match = false;
+    }
+    row.classList.toggle('hidden', !match);
+  }
+  if (!activeTab) return;
+  for (const tb of activeTab.querySelectorAll('.sub-body')) {
+    const hasVisible = tb.querySelector('tbody tr:not(.hidden)');
+    tb.parentElement.classList.toggle('hidden', !hasVisible && q !== '');
+  }
+  for (const cb of activeTab.querySelectorAll('.cat-body')) {
+    const hasVisible = cb.querySelector('.sub:not(.hidden)');
+    cb.parentElement.classList.toggle('hidden', !hasVisible && q !== '');
+  }
+  for (const sb of activeTab.querySelectorAll('.super-body')) {
+    const hasVisible = sb.querySelector('.cat:not(.hidden), .sub:not(.hidden)');
+    sb.parentElement.classList.toggle('hidden', !hasVisible && q !== '');
+  }
+  updateSummary();
+}
+
+
+let currentSort = null; // {key:'name', dir:'asc'}
+
+function getCellValue(row, index) {
+  const cell = row.cells[index];
+  if (!cell) return '';
+  let text = cell.textContent.trim();
+  // Try to parse as number
+  const num = parseFloat(text);
+  if (!isNaN(num) && text !== '') return num;
+  return text.toLowerCase();
+}
+
+function sortTable(table, colIndex) {
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const headers = table.querySelectorAll('thead th');
+  const key = headers[colIndex]?.dataset?.sortKey || 'name';
+  const sameKey = currentSort && currentSort.key === key;
+  const dir = sameKey ? (currentSort.dir === 'asc' ? 'desc' : 'asc') : 'asc';
+  currentSort = {key, dir};
+
+  // Update sort indicators
+  headers.forEach((th, i) => {
+    th.classList.toggle('active', i === colIndex);
+    const arrow = th.querySelector('.sort-indicator');
+    if (arrow) arrow.remove();
+    if (i === colIndex) {
+      const span = document.createElement('span');
+      span.className = 'sort-indicator';
+      span.textContent = dir === 'asc' ? ' ▲' : ' ▼';
+      th.appendChild(span);
+    }
+  });
+
+  rows.sort((a, b) => {
+    let va = getCellValue(a, colIndex);
+    let vb = getCellValue(b, colIndex);
+    if (typeof va === 'number' && typeof vb === 'number') {
+      return dir === 'asc' ? va - vb : vb - va;
+    }
+    return dir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+  });
+
+  for (const row of rows) tbody.appendChild(row);
+  // Re-apply hidden state from search/filter
+  applySearch();
+}
+
+function renderAllTabs() {
+  const el = document.getElementById('tab-full');
+  el.innerHTML = Object.keys(superMap).map(s => renderTree(s, 'full')).join('\n');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore persisted state
+  let savedFilter = null, savedQuery = null;
+  try { savedFilter = localStorage.getItem('evoParamFilter'); } catch(e) {}
+  try { savedQuery = localStorage.getItem('evoParamQuery'); } catch(e) {}
+  renderAllTabs();
+  if (savedFilter) {
+    const filterBtn = document.querySelector('.filter-btn[data-filter="' + savedFilter + '"]');
+    if (filterBtn) filterBtn.click();
+  }
+  if (savedQuery) {
+    const el = document.getElementById('search');
+    el.value = savedQuery;
+    currentQuery = savedQuery;
+    document.getElementById('searchClear').style.display = 'block';
+  }
+  document.getElementById('search').addEventListener('input', e => {
+    currentQuery = e.target.value;
+    try { localStorage.setItem('evoParamQuery', currentQuery); } catch(e) {}
+    document.getElementById('searchClear').style.display = e.target.value ? 'block' : 'none';
+    applySearch();
+  });
+  document.getElementById('searchClear').addEventListener('click', () => {
+    const el = document.getElementById('search');
+    el.value = '';
+    el.dispatchEvent(new Event('input'));
+    el.focus();
+  });
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      try { localStorage.setItem('evoParamFilter', currentFilter); } catch(e) {}
+      applySearch();
+    });
+  });
+  // Sortable headers
+  document.addEventListener('click', e => {
+    const th = e.target.closest('th.sortable');
+    if (!th) return;
+    const table = th.closest('table');
+    if (!table) return;
+    const colIndex = Array.from(table.querySelectorAll('thead th')).indexOf(th);
+    if (colIndex >= 0) sortTable(table, colIndex);
+  });
+
+
+  updateSummary();
+});
+</script>
+</body>
+</html>
+      ringRadius",type:"I",min:"100",avg:"1000",max:"2500",imp:0,loc:6,scope:"E",live:"No",desc:"Radius of the ring spawn pattern when distributionMode = ring. Particles spawn within this circular area centered on the world. Applicable only in ring mode."},
+      {name:"spawnDensityMap",type:"F",min:"0",avg:"0",max:"1",imp:0,loc:5,scope:"E",live:"No",desc:"Spatial density variation for spawn. 0=uniform; 0.5=hot spots; 1=extreme variation."},
+      {name:"shuffleOnReset",type:"B",min:"—",avg:"true",max:"—",imp:0,loc:2,scope:"E",live:"No",desc:"Change random seed on each reset for varied spawn configurations."},
+      {name:"speciesDistribution",type:"B",min:"—",avg:"false",max:"—",imp:0,loc:4,scope:"E",live:"No",desc:"Per-species independent distribution modes when enabled."},
+      {name:"spawnGroupSize",type:"I",min:"1",avg:"1",max:"10",imp:0,loc:3,scope:"E",live:"No",desc:"Particles per spawn point. 1=individual; 2=pairs; >3=clusters."}

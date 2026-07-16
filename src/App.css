@@ -2,6 +2,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  --panel-width: 360px;
   --glass-bg: rgba(10, 10, 22, 0.82);
   --glass-border: rgba(255, 255, 255, 0.06);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -10,7 +11,6 @@
   --text-muted: #555570;
   --accent-cyan: #22d3ee;
   --accent-magenta: #d946ef;
-  --accent-gold: #fbbf24;
   --accent: #6c5ce7;
   --radius: 10px;
   --radius-sm: 6px;
@@ -122,10 +122,10 @@ html, body, #root {
   cursor: pointer; transition: all 0.3s ease; font-size: 14px;
 }
 .panel-toggle:hover { border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
-.panel-toggle.open { left: 372px; }
+.panel-toggle.open { left: calc(var(--panel-width, 360px) + 12px); }
 
 .controls-panel {
-  position: absolute; left: 0; top: 0; bottom: 0; width: 360px;
+  position: absolute; left: 0; top: 0; bottom: 0; width: var(--panel-width);
   z-index: 15; overflow: hidden;
   background: var(--glass-bg); backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -298,8 +298,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .controls-panel { width: 300px; }
-  .panel-toggle.open { left: 312px; }
+  .controls-panel { --panel-width: 300px; width: var(--panel-width); }
+  .panel-toggle.open { left: calc(var(--panel-width, 300px) + 12px); }
   .brand-tagline { display: none; }
   .top-stats { font-size: 9px; padding: 3px 8px; }
 }

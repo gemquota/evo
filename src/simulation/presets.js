@@ -2,11 +2,11 @@
 
 function baseSpecies() {
   return [
-    { name: 'Cyan', count: 1000, speed: 18, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
-    { name: 'Magenta', count: 1000, speed: 14, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
-    { name: 'Lime', count: 1000, speed: 22, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
-    { name: 'Gold', count: 1000, speed: 12, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
-    { name: 'Coral', count: 1000, speed: 16, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
+    { name: 'Cyan', count: 1000, size: 3.5, hue: 185, saturation: 90, lightness: 65, interactionRadius: 600, repulsionRadius: 80, repulsionStrength: 1.2, maxSpeed: 60 },
+    { name: 'Magenta', count: 1000, size: 3, hue: 310, saturation: 85, lightness: 60, interactionRadius: 550, repulsionRadius: 70, repulsionStrength: 1.1, maxSpeed: 55 },
+    { name: 'Lime', count: 1000, size: 2.5, hue: 120, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 65, repulsionStrength: 1.3, maxSpeed: 65 },
+    { name: 'Gold', count: 1000, size: 4, hue: 45, saturation: 95, lightness: 60, interactionRadius: 700, repulsionRadius: 90, repulsionStrength: 0.9, maxSpeed: 50 },
+    { name: 'Coral', count: 1000, size: 3, hue: 10, saturation: 80, lightness: 60, interactionRadius: 600, repulsionRadius: 75, repulsionStrength: 1.0, maxSpeed: 55 },
   ];
 }
 
@@ -48,11 +48,11 @@ export const PRESETS = [
 
   // Ecosystem — predator-prey chasing and swarming
   preset([
-    { name: 'Prey', count: 1000, speed: 24, size: 2, hue: 120, saturation: 85, lightness: 60, interactionRadius: 800, repulsionRadius: 60, repulsionStrength: 1.5, maxSpeed: 80 },
-    { name: 'Predator', count: 200, speed: 30, size: 5, hue: 0, saturation: 90, lightness: 55, interactionRadius: 1000, repulsionRadius: 100, repulsionStrength: 0.4, maxSpeed: 100 },
-    { name: 'Scavenger', count: 500, speed: 18, size: 2.5, hue: 40, saturation: 85, lightness: 55, interactionRadius: 600, repulsionRadius: 55, repulsionStrength: 0.9, maxSpeed: 50 },
-    { name: 'Toxin', count: 300, speed: 8, size: 4.5, hue: 280, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 120, repulsionStrength: 0.3, maxSpeed: 30 },
-    { name: 'Symbiote', count: 300, speed: 14, size: 2, hue: 200, saturation: 90, lightness: 60, interactionRadius: 550, repulsionRadius: 50, repulsionStrength: 1.8, maxSpeed: 50 },
+    { name: 'Prey', count: 1000, size: 2, hue: 120, saturation: 85, lightness: 60, interactionRadius: 800, repulsionRadius: 60, repulsionStrength: 1.5, maxSpeed: 80 },
+    { name: 'Predator', count: 200, size: 5, hue: 0, saturation: 90, lightness: 55, interactionRadius: 1000, repulsionRadius: 100, repulsionStrength: 0.4, maxSpeed: 100 },
+    { name: 'Scavenger', count: 500, size: 2.5, hue: 40, saturation: 85, lightness: 55, interactionRadius: 600, repulsionRadius: 55, repulsionStrength: 0.9, maxSpeed: 50 },
+    { name: 'Toxin', count: 300, size: 4.5, hue: 280, saturation: 80, lightness: 55, interactionRadius: 500, repulsionRadius: 120, repulsionStrength: 0.3, maxSpeed: 30 },
+    { name: 'Symbiote', count: 300, size: 2, hue: 200, saturation: 90, lightness: 60, interactionRadius: 550, repulsionRadius: 50, repulsionStrength: 1.8, maxSpeed: 50 },
   ], [
     [ 0.8, -1.0,  0.3,  0.0,  0.5],
     [ 1.0,  0.0, -0.6, -0.3,  0.2],
@@ -62,7 +62,7 @@ export const PRESETS = [
   ], { friction: 0.76, trailOpacity: 0.04, timeScale: 1.2, maxForce: 3.5, noiseAmount: 0.06, name: '🦠 Ecosystem', desc: 'Predator-prey chasing and swarming' }),
 
   // Crystallis — crystal lattices and formations
-  preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 0.6), speed: s.speed * 0.5, interactionRadius: s.interactionRadius * 1.5 })), [
+  preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 0.6), interactionRadius: s.interactionRadius * 1.5 })), [
     [ 1.5,  0.2, -0.8,  0.1, -0.3],
     [ 0.2,  1.8,  0.3, -0.7,  0.0],
     [-0.8,  0.3,  1.2,  0.4, -0.5],
@@ -71,7 +71,7 @@ export const PRESETS = [
   ], { friction: 0.92, trailOpacity: 0.02, timeScale: 0.5, maxForce: 1.5, noiseAmount: 0.01, name: '💎 Crystallis', desc: 'Crystal lattices and formations' }),
 
   // Nebula — swirling cosmic clouds
-  preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 1.8), speed: s.speed * 0.8, size: s.size * 0.7 })), [
+  preset(baseSpecies().map(s => ({ ...s, count: Math.round(s.count * 1.8), size: s.size * 0.7 })), [
     [ 0.3,  0.6,  0.2, -0.1,  0.4],
     [-0.2,  0.5,  0.8,  0.3, -0.3],
     [ 0.1, -0.4,  0.4,  0.7,  0.2],
@@ -105,4 +105,16 @@ export const DEFAULT_CONFIG = {
   clusterCount: 8, clusterSpread: 400, ringRadius: 1000,
   zRange: 10000, stackPerspective: 2,
   physicsRate: 1, renderQuality: 1,
+  gravityWell: 0, gravityWellRadius: 2500, vortexStrength: 0,
+  bounceRestitution: 0.5, massVariation: 0, forceDecayPower: 2,
+  interactionJitter: 0, velocityDampingZ: 0.82, dragLinear: 0,
+  boundaryRepelForce: 0, pairwiseCutoff: 200, matrixDrift: 0,
+  connectionOpacity: 0.08, connectionWidth: 0.4, connectionFade: 2,
+  starBrightness: 0.35, starDensity: 1, depthCue: 0.5,
+  minRadius: 0.5, maxRadius: 12, minSpeed: 0,
+  repulsionFalloff: 1, harmonicStrength: 0, harmonicRange: 1000,
+  wanderRate: 0, bounceFriction: 0.3, bounceRandomize: 0,
+  noiseFieldScale: 0.01, noiseFieldStrength: 0, worldMargin: 50,
+  spawnJitter: 0.2, velocityClip: 0,
+  gridOpacity: 0.15, particleOpacity: 1.0,
 };

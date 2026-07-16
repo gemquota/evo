@@ -20,7 +20,7 @@ export class ParticleLifeRenderer {
   get frameTime() { return this._frameTime; }
   get visibleCount() { return this._visible.length; }
 
-  setSize(w, h) {
+  setSize(w, h, config) {
     this.logicalWidth = w;
     this.logicalHeight = h;
     const dpr = window.devicePixelRatio || 1;
@@ -30,12 +30,12 @@ export class ParticleLifeRenderer {
     this.canvas.style.height = h + 'px';
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.stars = Array.from(
-      { length: Math.floor(w * h * 0.00015) },
+      { length: Math.floor(w * h * 0.00015 * ((config && config.starDensity) || 1)) },
       () => ({
         x: Math.random() * w,
         y: Math.random() * h,
         r: 0.3 + Math.random() * 0.8,
-        a: 0.15 + Math.random() * 0.35,
+        a: (0.15 + Math.random() * 0.35) * ((config && config.starBrightness != null) ? config.starBrightness : 0.35),
         speed: 0.1 + Math.random() * 0.3,
       })
     );
@@ -54,12 +54,14 @@ export class ParticleLifeRenderer {
     const {
       trailsEnabled, trailOpacity, connectionsEnabled, connectionDistance,
       showGlow, glowIntensity, species, edgeMode,
-      worldWidth, worldHeight, showWorldBorder, stackPerspective, renderQuality,
+      worldWidth, worldHeight, showWorldBorder, stackPerspective, renderQuality, gridOpacity, particleOpacity, connectionOpacity, connectionWidth, connectionFade, starBrightness, starDensity, depthCue, minRadius, maxRadius, glowSpread, hdrExposure, saturationBoost, borderGlow, trailGap, colorShift, particleContrast, starTwinkle,
     } = config;
     const { particles, camX, camY, camZoom } = snapshot;
     const W = this.logicalWidth, H = this.logicalHeight;
     const n = particles ? particles.length : 0;
     this.time++;
+    const tg = trailGap || 1;
+    if (tg > 1 && this.time % tg !== 0) return;
 
     // Adaptive quality
     if (config.adaptiveQuality !== false) {
@@ -71,18 +73,27 @@ export class ParticleLifeRenderer {
     }
     const q = Math.min(1, Math.max(0.25, (renderQuality != null ? renderQuality : 1) * this._autoQuality));
     const skipGlow = !showGlow || glowIntensity < 0.01 || q < 0.4;
-    const glowMul = skipGlow ? 0 : glowIntensity * q;
+    const glowMul = skipGlow ? 0 : glowIntensity * q * (hdrExposure || 1);
     const skipConn = !connectionsEnabled || connectionDistance < 1 || q < 0.3;
 
-    // Background
-    ctx.fillStyle = '#05050a';
-    ctx.fillRect(0, 0, W, H);
-    for (const s of this.stars) {
-      const t = 0.7 + 0.3 * Math.sin(this.time * 0.02 * s.speed + s.x);
-      ctx.fillStyle = `rgba(180,190,220,${s.a * t})`;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fill();
+    // Background — when trails on, fade previous frame instead of clearing
+    if (trailsEnabled && trailOpacity > 0) {
+      // Screen-space fade for stars and content outside world rect
+      const hdr = hdrExposure || 1;
+          ctx.fillStyle = `rgba(5,5,10,${trailOpacity})`;
+      ctx.fillRect(0, 0, W, H);
+      // Stars not redrawn — they fade gracefully via trail overlay
+    } else {
+      ctx.fillStyle = '#05050a';
+      ctx.fillRect(0, 0, W, H);
+      for (const s of this.stars) {
+        const stw = starTwinkle || 0.3;
+            const t = 0.7 + 0.3 * Math.sin(this.time * 0.02 * s.speed * stw * 3 + s.x);
+        ctx.fillStyle = `rgba(180,190,220,${s.a * t})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     ctx.save();
@@ -90,15 +101,23 @@ export class ParticleLifeRenderer {
     ctx.scale(camZoom, camZoom);
     const ww = worldWidth || 800, wh = worldHeight || 600;
 
-    ctx.fillStyle = '#08081a';
-    ctx.fillRect(0, 0, ww, wh);
+    if (trailsEnabled && trailOpacity > 0) {
+      // Trail overlay fades previous world content (particles, faded grid)
+      ctx.fillStyle = `rgba(8,8,26,${trailOpacity})`;
+      ctx.fillRect(0, 0, ww, wh);
+    } else {
+      ctx.fillStyle = '#08081a';
+      ctx.fillRect(0, 0, ww, wh);
+    }
 
     // Grid lines
     if (showWorldBorder && q >= 0.5) {
-      ctx.strokeStyle = 'rgba(100,110,200,0.15)';
+      ctx.strokeStyle = `rgba(100,110,200,${gridOpacity != null ? gridOpacity : 0.15})`;
       ctx.lineWidth = 1 / camZoom;
       ctx.strokeRect(0, 0, ww, wh);
-      ctx.strokeStyle = 'rgba(100,110,200,0.04)';
+      const bg = borderGlow || 0;
+      if (bg > 0) { ctx.strokeStyle = `rgba(100,150,255,${bg * 0.3})`; ctx.lineWidth = (2 + bg * 4) / camZoom; ctx.shadowColor = 'rgba(100,150,255,0.2)'; ctx.shadowBlur = bg * 8; ctx.strokeRect(0, 0, ww, wh); ctx.shadowBlur = 0; }
+      ctx.strokeStyle = `rgba(100,110,200,${gridOpacity != null ? gridOpacity * 0.27 : 0.04})`;
       ctx.lineWidth = 0.5 / camZoom;
       const vpX0 = Math.max(0, -camX / camZoom);
       const vpY0 = Math.max(0, -camY / camZoom);
@@ -113,25 +132,25 @@ export class ParticleLifeRenderer {
       }
     }
 
-    if (trailsEnabled && trailOpacity > 0) {
-      ctx.fillStyle = `rgba(8,8,26,${trailOpacity})`;
-      ctx.fillRect(0, 0, ww, wh);
-    }
     if (n === 0) { ctx.restore(); this.stepFps(t0); return; }
 
     const zr = snapshot.zRange || 1000;
     const persp = stackPerspective != null ? stackPerspective : 0.3;
     const cx = ww / 2, cy = wh / 2;
 
-    // Pre-compute species rendering data
+        // Pre-compute species rendering data
+    const sb2 = saturationBoost || 0;
+    const cs2 = colorShift || 0;
     const sd = new Array(species.length);
     for (let si = 0; si < species.length; si++) {
       const s = species[si];
+      const sat = Math.min(100, s.saturation + sb2 * 20);
+      const hue = ((s.hue + cs2) % 360 + 360) % 360;
       sd[si] = {
-        fill: this.hsl(s.hue, s.saturation, s.lightness),
-        glowColor: this.hsl(s.hue, s.saturation, Math.min(s.lightness + 25, 92)),
-        glowDark: this.hsl(s.hue, s.saturation, Math.min(s.lightness + 15, 85), 0.3 * glowIntensity),
-        highlight: this.hsl(s.hue, Math.min(s.saturation + 10, 100), Math.min(s.lightness + 35, 98)),
+        fill: this.hsl(hue, sat, s.lightness, particleOpacity != null ? particleOpacity : 1),
+        glowColor: this.hsl(hue, sat, Math.min(s.lightness + 25, 92), particleOpacity != null ? particleOpacity : 1),
+        glowDark: this.hsl(hue, sat, Math.min(s.lightness + 15, 85), 0.3 * (glowIntensity || 1)),
+        highlight: this.hsl(hue, Math.min(sat + 10, 100), Math.min(s.lightness + 35, 98)),
         size: s.size || 3,
       };
     }
@@ -153,7 +172,8 @@ export class ParticleLifeRenderer {
 
       const sx = cx + (p.x - cx) * scale;
       const sy = cy + (p.y - cy) * scale;
-      const za = Math.max(0.5, 1 - (zDist / zr) * 0.5);
+      const dc = depthCue != null ? depthCue : 0.5;
+            const za = Math.max(0.2, 1 - (zDist / zr) * dc);
 
       if (sx < -2000 || sx > ww + 2000 || sy < -2000 || sy > wh + 2000) continue;
       vl.push({ p, sx, sy, za });
@@ -180,9 +200,11 @@ export class ParticleLifeRenderer {
           }
           if (dx * dx + dy * dy < connectionDistance * connectionDistance) {
             const d = Math.sqrt(dx * dx + dy * dy);
-            const alpha = (1 - d / connectionDistance) * 0.08 * Math.min(a.za, b.za);
+            const connAlpha = connectionOpacity != null ? connectionOpacity : 0.08;
+            const connFade = connectionFade || 2;
+            const alpha = Math.pow(1 - d / connectionDistance, connFade) * connAlpha * Math.min(a.za, b.za);
             ctx.strokeStyle = this.hsl((sd[a.p.species].hue + sd[b.p.species].hue) / 2, 60, 55, alpha);
-            ctx.lineWidth = 0.4;
+            ctx.lineWidth = connectionWidth != null ? connectionWidth : 0.4;
             ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
             drawn++;
           }
@@ -197,7 +219,8 @@ export class ParticleLifeRenderer {
       for (let vi = 0; vi < vl.length; vi++) {
         const v = vl[vi];
         const s = sd[v.p.species];
-        const blur = Math.min(s.size * 3.5 * glowMul, 30);
+        const gs = glowSpread || 1;
+            const blur = Math.min(s.size * 3.5 * glowMul * gs, 60);
         if (v.p.species !== curSpecies || blur !== curBlur) {
           ctx.shadowBlur = blur;
           ctx.shadowColor = s.glowColor;
@@ -216,7 +239,9 @@ export class ParticleLifeRenderer {
     for (let vi = 0; vi < vl.length; vi++) {
       const v = vl[vi];
       const s = sd[v.p.species];
-      const r = Math.max(0.5, s.size * 0.65);
+      const minR = minRadius || 0.5; const maxR = maxRadius || 12;
+      const pc = particleContrast || 1;
+      const r = Math.min(maxR, Math.max(minR, s.size * 0.65 * pc));
       if (v.p.species !== curSpecies) {
         ctx.fillStyle = s.fill;
         curSpecies = v.p.species;

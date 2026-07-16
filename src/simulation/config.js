@@ -26,7 +26,42 @@ const NUMERIC_FIELDS = {
   physicsRate:        { min: 1,    max: 5    },
   renderQuality:      { min: 0.25, max: 1    },
   attractForce:       { min: 0.1,  max: 10   },
-  attractRadius:      { min: 10,   max: 1000 },
+  attractRadius:      { min: 10,   max: 1000 },  gravityWell:        { min: 0,    max: 5    },
+  gravityWellRadius:  { min: 100,  max: 10000 },
+  vortexStrength:     { min: 0,    max: 3    },
+  bounceRestitution:  { min: 0.1,  max: 1    },
+  massVariation:      { min: 0,    max: 1    },
+  forceDecayPower:    { min: 0.5,  max: 4    },
+  interactionJitter:  { min: 0,    max: 1    },
+  velocityDampingZ:   { min: 0.1,  max: 0.99 },
+  dragLinear:         { min: 0,    max: 0.5  },
+  boundaryRepelForce: { min: 0,    max: 5    },
+  pairwiseCutoff:     { min: 10,   max: 1000 },
+  matrixDrift:        { min: 0,    max: 0.1  },
+
+  connectionOpacity:  { min: 0,    max: 0.5  },
+  connectionWidth:    { min: 0.1,  max: 3    },
+  connectionFade:     { min: 0.5,  max: 4    },
+  starBrightness:     { min: 0,    max: 1    },
+  starDensity:        { min: 0.25, max: 3    },
+  depthCue:           { min: 0,    max: 1    },
+  minRadius:          { min: 0.2,  max: 3    },
+  maxRadius:          { min: 3,    max: 20   },
+  minSpeed:           { min: 0,    max: 5    },
+  repulsionFalloff:   { min: 0.5,  max: 4    },
+  harmonicStrength:   { min: 0,    max: 2    },
+  harmonicRange:      { min: 100,  max: 5000 },
+  wanderRate:         { min: 0,    max: 0.5  },
+  bounceFriction:     { min: 0,    max: 1    },
+  bounceRandomize:    { min: 0,    max: 30   },
+  noiseFieldScale:    { min: 0.001,max: 0.1  },
+  noiseFieldStrength: { min: 0,    max: 3    },
+  worldMargin:        { min: 10,   max: 500  },
+  spawnJitter:        { min: 0,    max: 0.5  },
+  velocityClip:       { min: 0,    max: 1    },
+
+  gridOpacity:        { min: 0,    max: 0.5  },
+  particleOpacity:    { min: 0.2,  max: 1    },
 };
 
 const BOOLEAN_FIELDS = [
@@ -61,19 +96,26 @@ export function validateSpecies(species) {
   if (!Array.isArray(species) || species.length === 0) {
     return DEFAULT_CONFIG.species.map((s) => ({ ...s }));
   }
-  return species.map((s) => ({
-    name: s.name || 'Unknown',
-    count: Math.max(0, Math.floor(Number(s.count) || 0)),
-    speed: clamp(Number(s.speed) || 0, 1, 100),
-    maxSpeed: clamp(Number(s.maxSpeed) || 0, 1, 300),
-    size: clamp(Number(s.size) || 0, 0.5, 12),
-    hue: ((Number(s.hue) || 0) % 360 + 360) % 360,
-    saturation: clamp(Number(s.saturation) || 0, 0, 100),
-    lightness: clamp(Number(s.lightness) || 0, 20, 90),
-    interactionRadius: clamp(Number(s.interactionRadius) || 0, 50, 5000),
-    repulsionRadius: clamp(Number(s.repulsionRadius) || 0, 10, 800),
-    repulsionStrength: clamp(Number(s.repulsionStrength) || 0, 0.1, 3),
-  }));
+  return species.map((s) => {
+    const sv = {
+      name: s.name || 'Unknown',
+      count: Math.max(0, Math.floor(Number(s.count) || 0)),
+      maxSpeed: clamp(Number(s.maxSpeed) || 0, 1, 300),
+      size: clamp(Number(s.size) || 0, 0.5, 12),
+      hue: ((Number(s.hue) || 0) % 360 + 360) % 360,
+      saturation: clamp(Number(s.saturation) || 0, 0, 100),
+      lightness: clamp(Number(s.lightness) || 0, 20, 90),
+      interactionRadius: clamp(Number(s.interactionRadius) || 0, 50, 5000),
+      repulsionRadius: clamp(Number(s.repulsionRadius) || 0, 10, 800),
+      repulsionStrength: clamp(Number(s.repulsionStrength) || 0, 0.1, 3),
+    };
+    // Prevent dead zone: repulsion radius must be smaller than interaction radius
+    // Otherwise particles between the two radii get silently ignored by physics
+    if (sv.repulsionRadius >= sv.interactionRadius) {
+      sv.repulsionRadius = Math.max(sv.interactionRadius * 0.5, 10);
+    }
+    return sv;
+  });
 }
 
 export function validateMatrix(matrix, n) {

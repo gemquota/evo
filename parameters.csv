@@ -1,0 +1,49 @@
+SuperCategory,Category,SubCategory,Parameter,Type,Min,Default,Max,Importance,LoC,Scope,Live,Description
+Global Config,Physics,Dynamics,friction,F,0.1,0.82,0.99,3,14,E,Yes,Velocity damping per frame
+Global Config,Physics,Dynamics,timeScale,F,0.05,1.0,3,3,15,E,Yes,Speed multiplier for all physics
+Global Config,Physics,Dynamics,maxForce,F,0.1,3.0,5,2,14,E,Yes,Force clamping ceiling
+Global Config,Physics,Dynamics,noiseAmount,F,0,0.04,2,2,14,E,Yes,Random perturbation per frame
+Global Config,Physics,Solver,physicsRate,I,1,1,5,0,5,E,Yes,Physics frame skip (1=every frame)
+Global Config,Rendering,Trails,trailsEnabled,B,—,true,—,1,6,R,Yes,Enable frame-to-frame trail persistence
+Global Config,Rendering,Trails,trailOpacity,F,0,0.03,0.2,1,16,R,Yes,How strongly each frame fades previous
+Global Config,Rendering,Glow,showGlow,B,—,true,—,1,5,R,Yes,Enable bloom glow effect
+Global Config,Rendering,Glow,glowIntensity,F,0,1.0,2,1,7,R,Yes,Glow brightness multiplier
+Global Config,Rendering,Connections,connectionsEnabled,B,—,false,—,1,5,R,Yes,Draw inter-particle connection lines
+Global Config,Rendering,Connections,connectionDistance,F,50,600,2500,1,7,R,Yes,Max distance for connection lines
+Global Config,Rendering,Quality,renderQuality,F,0.25,1,1,0,5,R,Yes,Resolution scale for glow/connections
+Global Config,Rendering,Quality,adaptiveQuality,B,—,true,—,0,3,R,Yes,Auto-degrade quality when FPS < 20
+Global Config,Rendering,Overlay,showStats,B,—,true,—,0,4,R,Yes,Show FPS/count HUD overlay
+Global Config,Rendering,Overlay,showWorldBorder,B,—,true,—,0,5,R,Yes,Show world boundary + grid lines
+Global Config,World,Dimensions,worldWidth,I,200,2500,10000,2,8,B,Yes,World width in world units
+Global Config,World,Dimensions,worldHeight,I,200,1406,10000,2,8,B,Yes,World height in world units
+Global Config,World,Edge,edgeMode,E,—,wrap,—,3,11,E,Yes,Boundary behavior
+Global Config,World,Z-Space,zRange,F,10,10000,10000,1,9,B,Yes,Z-axis depth range
+Global Config,World,Z-Space,stackPerspective,F,0,2,10,1,5,B,Yes,"Perspective scaling (0=flat, 10=extreme)"
+Global Config,Distribution,Spawn Pattern,distributionMode,E,—,random,—,2,9,E,No,Particle spawn arrangement
+Global Config,Distribution,Spawn Pattern,initialVelocity,E,—,random,—,2,5,E,No,Starting velocity profile
+Global Config,Distribution,Cluster,clusterCount,I,1,8,30,0,5,E,No,Number of spawn clusters
+Global Config,Distribution,Cluster,clusterSpread,I,50,400,2500,0,5,E,No,Spread radius per cluster
+Global Config,Distribution,Ring,ringRadius,I,100,1000,2500,0,6,E,No,Ring radius
+Global Config,Input,Touch Attract,attractForce,F,0.1,2.0,10,2,3,E,Yes,Single-finger attraction strength
+Global Config,Input,Touch Attract,attractRadius,F,10,300,1000,2,3,E,Yes,Attraction radius in screen pixels
+Species Config,,Identity,name,S,—,Cyan/Magenta/Lime/Gold/Coral,—,0,30,R,Yes,Display name
+Species Config,,Identity,hue,I,—,185/310/120/45/10,—,1,21,R,Yes,Color hue
+Species Config,,Identity,saturation,I,—,90/85/80/95/80,—,1,20,R,Yes,Color saturation
+Species Config,,Identity,lightness,I,—,65/60/55/60/60,—,1,20,R,Yes,Color lightness
+Species Config,,Population,count,I,10,1000,3000,3,31,E,No,Number of particles of this species
+Species Config,,Movement,maxSpeed,F,1,60/55/65/50/55,300,3,13,E,Yes,Speed cap (world units/frame)
+Species Config,,Appearance,size,F,0.5,3.5/3/2.5/4/3,12,1,20,R,Yes,Particle radius in world units
+Species Config,,Interaction Physics,interactionRadius,I,50,600/550/500/700/600,5000,3,19,E,Yes,Detection range for other particles
+Species Config,,Interaction Physics,repulsionRadius,I,10,80/70/65/90/75,800,3,16,E,Yes,Hard repulsion zone radius
+Species Config,,Interaction Physics,repulsionStrength,F,0.1,1.2/1.1/1.3/0.9/1.0,3,3,13,E,Yes,Repulsion force multiplier
+Interaction Matrix,,Force Matrix,matrix[i][j],F,—,~/preset,—,3,7,E,Yes,Attraction (+) or repulsion (−) from i→j
+Runtime State,Camera,Camera,camX,F,—,=,—,2,10,B,Yes,Camera X offset (screen pixels)
+Runtime State,Camera,Camera,camY,F,—,=,—,2,10,B,Yes,Camera Y offset (screen pixels)
+Runtime State,Camera,Camera,camZoom,F,0.05,=,20,2,20,B,Yes,Camera zoom level
+Runtime State,Performance,Performance Metrics,fps,I,—,—,—,1,20,R,Yes,Smoothed frames per second
+Runtime State,Performance,Performance Metrics,frameTime,F,—,—,—,0,10,R,Yes,Last frame render time (ms)
+Runtime State,Performance,Performance Metrics,visibleCount,I,—,—,—,0,8,R,Yes,Particles visible after Z-cull
+Runtime State,Performance,Performance Metrics,particleCount,I,—,—,—,1,10,R,Yes,Total particles alive
+Runtime State,Performance,Performance Metrics,_autoQuality,F,0.3,1,1,0,4,R,Yes,Adaptive quality multiplier
+Presets,,Metadata,preset name,S,—,Spiralis,—,1,11,U,Yes,Preset display name
+Presets,,Metadata,preset desc,S,—,~,—,0,9,U,Yes,Preset one-line description

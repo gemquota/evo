@@ -85,8 +85,14 @@ export function useInputHandlers(containerRef, engineRef, {
       }
     };
 
-    const onTouchEnd = () => {
-      if (engineRef.current) engineRef.current.clearTouchAttract();
+    const onTouchEnd = (e) => {
+      if (e.touches.length === 1 && engineRef.current) {
+        const r = container.getBoundingClientRect();
+        const t = e.touches[0];
+        engineRef.current.setTouchAttract(t.clientX - r.left, t.clientY - r.top);
+      } else if (e.touches.length === 0 && engineRef.current) {
+        engineRef.current.clearTouchAttract();
+      }
     };
 
     container.addEventListener('wheel', onWheel, { passive: false });

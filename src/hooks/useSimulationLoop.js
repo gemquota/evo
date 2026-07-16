@@ -37,7 +37,7 @@ export function useSimulationLoop(canvasRef, containerRef, configRef) {
       const w = Math.floor(r.width);
       const h = Math.floor(r.height);
       if (w > 0 && h > 0) {
-        renderer.setSize(w, h);
+        renderer.setSize(w, h, configRef.current);
         engine.setViewSize(w, h);
       }
     };
