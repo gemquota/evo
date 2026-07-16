@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -26,9 +26,8 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npx vite build
-      - run: cp dist/params.html public/params.html 2>/dev/null; cp public/params.html dist/params.html 2>/dev/null; true
       - uses: actions/configure-pages@v4
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
       - id: deployment
