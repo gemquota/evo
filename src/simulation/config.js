@@ -9,36 +9,57 @@ function clamp(v, min, max) {
 
 // Bounds only — defaults come from DEFAULT_CONFIG automatically
 const NUMERIC_FIELDS = {
+  // ═══ DYNAMICS ═══
   friction:           { min: 0.1,  max: 0.99 },
   timeScale:          { min: 0.05, max: 3    },
   maxForce:           { min: 0.1,  max: 5    },
   noiseAmount:        { min: 0,    max: 2    },
-  trailOpacity:       { min: 0,    max: 0.2  },
-  glowIntensity:      { min: 0,    max: 2    },
-  connectionDistance: { min: 50,   max: 2500  },
+  minSpeed:           { min: 0,    max: 5    },
+  dragLinear:         { min: 0,    max: 0.5  },
+  physicsRate:        { min: 1,    max: 5    },
+  velocityDampingZ:   { min: 0.1,  max: 0.99 },
+  velocityClip:       { min: 0,    max: 1    },
+  massVariation:      { min: 0,    max: 1    },
+
+  // ═══ FORCES ═══
+  gravityWell:        { min: 0,    max: 5    },
+  gravityWellRadius:  { min: 100,  max: 10000 },
+  vortexStrength:     { min: 0,    max: 3    },
+  forceDecayPower:    { min: 0.5,  max: 4    },
+  interactionJitter:  { min: 0,    max: 1    },
+  harmonicStrength:   { min: 0,    max: 2    },
+  harmonicRange:      { min: 100,  max: 5000 },
+  repulsionFalloff:   { min: 0.5,  max: 4    },
+  wanderRate:         { min: 0,    max: 0.5  },
+  attractForce:       { min: 0.1,  max: 10   },
+  attractRadius:      { min: 10,   max: 1000 },
+  noiseFieldScale:    { min: 0.001,max: 0.1  },
+  noiseFieldStrength: { min: 0,    max: 3    },
+
+  // ═══ BOUNDARY ═══
+  bounceRestitution:  { min: 0.1,  max: 1    },
+  bounceFriction:     { min: 0,    max: 1    },
+  bounceRandomize:    { min: 0,    max: 30   },
+  boundaryRepelForce: { min: 0,    max: 5    },
+  worldMargin:        { min: 10,   max: 500  },
+  pairwiseCutoff:     { min: 10,   max: 1000 },
+
+  // ═══ WORLD ═══
   worldWidth:         { min: 200,  max: 10000 },
   worldHeight:        { min: 200,  max: 10000 },
   zRange:             { min: 10,   max: 10000 },
   stackPerspective:   { min: 0,    max: 10   },
+
+  // ═══ DISTRIBUTION ═══
   clusterCount:       { min: 1,    max: 30   },
   clusterSpread:      { min: 50,   max: 2500  },
   ringRadius:         { min: 100,  max: 2500  },
-  physicsRate:        { min: 1,    max: 5    },
-  renderQuality:      { min: 0.25, max: 1    },
-  attractForce:       { min: 0.1,  max: 10   },
-  attractRadius:      { min: 10,   max: 1000 },  gravityWell:        { min: 0,    max: 5    },
-  gravityWellRadius:  { min: 100,  max: 10000 },
-  vortexStrength:     { min: 0,    max: 3    },
-  bounceRestitution:  { min: 0.1,  max: 1    },
-  massVariation:      { min: 0,    max: 1    },
-  forceDecayPower:    { min: 0.5,  max: 4    },
-  interactionJitter:  { min: 0,    max: 1    },
-  velocityDampingZ:   { min: 0.1,  max: 0.99 },
-  dragLinear:         { min: 0,    max: 0.5  },
-  boundaryRepelForce: { min: 0,    max: 5    },
-  pairwiseCutoff:     { min: 10,   max: 1000 },
-  matrixDrift:        { min: 0,    max: 0.1  },
+  spawnJitter:        { min: 0,    max: 0.5  },
 
+  // ═══ RENDERING ═══
+  trailOpacity:       { min: 0,    max: 0.2  },
+  glowIntensity:      { min: 0,    max: 2    },
+  connectionDistance: { min: 50,   max: 2500  },
   connectionOpacity:  { min: 0,    max: 0.5  },
   connectionWidth:    { min: 0.1,  max: 3    },
   connectionFade:     { min: 0.5,  max: 4    },
@@ -47,21 +68,14 @@ const NUMERIC_FIELDS = {
   depthCue:           { min: 0,    max: 1    },
   minRadius:          { min: 0.2,  max: 3    },
   maxRadius:          { min: 3,    max: 20   },
-  minSpeed:           { min: 0,    max: 5    },
-  repulsionFalloff:   { min: 0.5,  max: 4    },
-  harmonicStrength:   { min: 0,    max: 2    },
-  harmonicRange:      { min: 100,  max: 5000 },
-  wanderRate:         { min: 0,    max: 0.5  },
-  bounceFriction:     { min: 0,    max: 1    },
-  bounceRandomize:    { min: 0,    max: 30   },
-  noiseFieldScale:    { min: 0.001,max: 0.1  },
-  noiseFieldStrength: { min: 0,    max: 3    },
-  worldMargin:        { min: 10,   max: 500  },
-  spawnJitter:        { min: 0,    max: 0.5  },
-  velocityClip:       { min: 0,    max: 1    },
-
   gridOpacity:        { min: 0,    max: 0.5  },
   particleOpacity:    { min: 0.2,  max: 1    },
+
+  // ═══ QUALITY ═══
+  renderQuality:      { min: 0.25, max: 1    },
+
+  // ═══ ADVANCED ═══
+  matrixDrift:        { min: 0,    max: 0.1  },
 };
 
 const BOOLEAN_FIELDS = [
